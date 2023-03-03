@@ -4,6 +4,7 @@ const Loggings = require('morgan');
 const mongoose = require('mongoose');
 
 //Routes
+const LoginRoute = require("./Routes/LoginRoute");
 const AdminstratorRoute = require('./Routes/AdminstratorRoute');
 //Port Connection
 const port = process.env.PORT || 8080; //Used in Listening
@@ -35,8 +36,11 @@ app.use(Loggings('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
+//LoginMW
+app.use(LoginRoute);
+
 // Use Routes
-app.use(AdminstratorRoute);
+// app.use(AdminstratorRoute);
 
 // Not Found MW
 app.use((request, response) => {

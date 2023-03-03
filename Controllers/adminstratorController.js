@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-require('./../Model/adminstratorModel');
+// require('./../Model/adminstratorModel');
 const bcrypt = require('bcrypt');
 
 const saltRounds = 10;
