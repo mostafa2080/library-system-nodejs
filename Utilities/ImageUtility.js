@@ -1,7 +1,8 @@
 const multer = require('multer');
 const path = require('path');
 
-exports.uploadImg = multer({
+exports.uploadImg =(Routepath)=>{
+return multer({
     fileFilter: (req, file, callBack) => {
       if (
         file.mimetype == 'image/png' ||
@@ -15,7 +16,7 @@ exports.uploadImg = multer({
     },
     storage: multer.diskStorage({
       destination: (req, file, callBack) => {
-        callBack(null, path.join(__dirname, '..', 'images', 'Adminstrator'));
+        callBack(null, path.join(__dirname, '..', 'images', Routepath));
       },
       filename: (req, file, callBack) => {
         let extension = path.extname(file.originalname);
@@ -26,6 +27,7 @@ exports.uploadImg = multer({
       },
     }),
   });
+}
   
  exports.setImage = (req, res, next) => {
     if (req.file && req.file.path) req.body.image = req.file.path;

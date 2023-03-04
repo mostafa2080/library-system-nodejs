@@ -13,7 +13,7 @@ router
   .get(adminOrAbove,AdminstratorController.getAllAdminstrators)
   .post(
     basicAdmin,
-    uploadImg.single('image'),
+    uploadImg('Adminstrator').single('image'),
     setImage,
     validateAdminstrator.validateAdminstratorArray,
     validateMW,
@@ -21,7 +21,7 @@ router
   )
   .patch(
     basicAdmin,
-    uploadImg.single('image'),
+    uploadImg('Adminstrator').single('image'),
     setImage,
     validateAdminstrator.optValidateAdminstratorArray,
     validateMW,
