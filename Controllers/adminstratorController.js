@@ -1,6 +1,8 @@
 const mongoose = require('mongoose');
 // require('./../Model/adminstratorModel');
+const fs = require("fs");
 const bcrypt = require('bcrypt');
+const { body } = require('express-validator');
 
 const saltRounds = 10;
 const salt = bcrypt.genSaltSync(saltRounds);
@@ -37,15 +39,16 @@ exports.addAdminstrator = (req, res, next) => {
 };
 
 //Update a Adminstrator
-exports.updateAdminstrator = (req, res, next) => {
+exports.updateAdminstrator = async (req, res, next) => {
   let hashPass = req.body.password
     ? bcrypt.hashSync(req.body.password, salt)
     : req.body.password;
+
+  let doc = await adminstratorsSchema.findOne({ firstName: req.body.firstName , lastName : req.body.lastName },{ image : 1});
+  let imagePath = doc["image"];
   adminstratorsSchema
     .updateOne(
-      {
-        firstName: req.body.firstName,
-      },
+      { firstName: req.body.firstName, lastName: req.body.lastName },
       {
         $set: {
           firstName: req.body.firstName,
@@ -60,21 +63,34 @@ exports.updateAdminstrator = (req, res, next) => {
       }
     )
     .then((data) => {
-      if (data.matchedCount == 0) {
+      if (data.matchedCount == 0) 
         next(new Error('Adminstrator not found'));
-      } else res.status(200).json({ data });
+      else 
+      {
+        if(req.body.image.toLowerCase().includes(".jpeg") 
+        || req.body.image.toLowerCase().includes(".jpg") 
+        || req.body.image.toLowerCase().includes(".png"))
+          fs.unlink(imagePath,error => next(error));
+
+        res.status(200).json({ data });
+      }
     })
     .catch((err) => next(err));
 };
 
 // Delete a Adminstrator
-exports.deleteAdminstrator = (req, res, next) => {
+exports.deleteAdminstrator = async (req, res, next) => {
+  let doc = await adminstratorsSchema.findOne({ firstName: req.body.firstName , lastName : req.body.lastName },{ image : 1});
   adminstratorsSchema
-    .deleteOne({ firstName: req.body.firstName })
+    .deleteOne({ firstName: req.body.firstName , lastName : req.body.lastName })
     .then((data) => {
-      if (data.deletedCount == 0) {
+      if (data.deletedCount == 0) 
         next(new Error('Adminstrator not found'));
-      } else res.status(200).json({ data });
+      else
+      {
+        fs.unlink(doc["image"],error => next(error));
+        res.status(200).json({ data });
+      }
     })
     .catch((err) => next(err));
 };

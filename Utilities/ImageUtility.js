@@ -22,7 +22,7 @@ return multer({
         let extension = path.extname(file.originalname);
         let fileName = path.basename(file.originalname, extension);
         let unqImgName =
-          file.fieldname + '-' + fileName + '-' + Date.now() + extension;
+        file.fieldname + '-' + fileName + '-' + Date.now() + extension;
         callBack(null, unqImgName);
       },
     }),
