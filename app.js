@@ -5,6 +5,7 @@ const mongoose = require('mongoose');
 
 //Routes
 const LoginRoute = require("./Routes/LoginRoute");
+const AuthenticationMW = require("./Core/AuthenticationMw/AuthenticationMW");
 const AdminstratorRoute = require('./Routes/AdminstratorRoute');
 //Port Connection
 const port = process.env.PORT || 8080; //Used in Listening
@@ -39,8 +40,11 @@ app.use(express.urlencoded({ extended: false }));
 //LoginMW
 app.use(LoginRoute);
 
+//AuthenticationMW
+app.use(AuthenticationMW);
+
 // Use Routes
-// app.use(AdminstratorRoute);
+app.use(AdminstratorRoute);
 
 // Not Found MW
 app.use((request, response) => {

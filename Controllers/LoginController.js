@@ -28,6 +28,24 @@ module.exports = async (req, res, next) => {
             })
             .catch(error => next(error));
         }
+        else if(data["email"] !== undefined)
+        {
+            bcrypt.compare(req.body.password, data["password"])
+            .then(data => {
+                if(data)
+                {
+                    let token = jwt.sign(
+                        { role : "Admin" },
+                        "OSTrack",
+                        { expiresIn : "8h" }
+                    )
+                    res.status(200).json({ Message : "Authenticated", token })
+                }
+                else
+                    throw new Error("Email Or Password Are Wrong");
+            })
+            .catch(error => next(error));
+        }
         else
             next(new Error("Email Or Password Are Wrong"))
     }
