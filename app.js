@@ -1,18 +1,60 @@
-const express = require("express");
-const morgan = require("morgan");
-const config = require("config");
-const debug = require("debug")("app:dev"); // Type DEBUG="app:dev npm start" to test in debug mode
+const express = require('express');
+const cors = require('cors');
+const Loggings = require('morgan');
+const mongoose = require('mongoose');
+
+//Routes
+const LoginRoute = require("./Routes/LoginRoute");
+const AuthenticationMW = require("./Core/AuthenticationMw/AuthenticationMW");
+const AdminstratorRoute = require('./Routes/AdminstratorRoute');
+//Port Connection
+const port = process.env.PORT || 8080; //Used in Listening
 const app = express();
 
-const port = process.env.PORT || 3000;
+// Strict Query Handiling
+mongoose.set('strictQuery', true);
+// Db Connection
+mongoose
+  .connect('mongodb://127.0.0.1:27017/librarySystem')
+  .then(() => {
+    console.log('DB connected');
+    // Listening
+    app.listen(port, () => {
+      console.log(`Listening on port ${port}`);
+    });
+  })
+  .catch((error) => {
+    console.log('Db Problem ' + error);
+  });
 
-debug(config.get("name"));
+// CORS
+app.use(cors());
 
-app.use(morgan("tiny"));
+// Loggings MiddleWare using Morgan
+app.use(Loggings('dev'));
+
+// Parsing
 app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-app.use((err, req, res, next) => {
-    res.status(500).send(new Error("Internal Server Error"));
+app.use(express.urlencoded({ extended: false }));
+
+//LoginMW
+app.use(LoginRoute);
+
+//AuthenticationMW
+app.use(AuthenticationMW);
+
+// Use Routes
+app.use(AdminstratorRoute);
+
+// Not Found MW
+app.use((request, response) => {
+  console.log('Not Found');
+  response.status(404).json({
+    message: 'Not Found',
+  });
 });
 
-app.listen(port, () => console.log(`Listening on port ${port} ...`));
+// Error MW
+app.use((error, request, response, next) => {
+  response.status(500).json({ message: error + '' });
+});
