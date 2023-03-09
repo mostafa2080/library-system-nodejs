@@ -24,7 +24,7 @@ const booksSchema = new mongoose.Schema({
     },
     dateAdded: {
         type: Date,
-        required: [true, "Enter publishing date 😠"],
+        required: false,
         default: Date.now,
     },
     datePublished: {
