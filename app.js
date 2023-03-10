@@ -10,7 +10,7 @@ console.log(config.name);
 //Routes
 const LoginRoute = require("./Routes/LoginRoute");
 const AuthenticationMW = require("./Core/AuthenticationMw/AuthenticationMW");
-const AdminstratorRoute = require("./Routes/AdminstratorRoute");
+const AdministratorRoute = require("./Routes/AdministratorRoute");
 const EmployeeRoute = require("./Routes/EmployeeRoute");
 const BooksRoute = require("./Routes/BooksRoute");
 //Port Connection
@@ -55,7 +55,7 @@ app.use(LoginRoute);
 app.use(AuthenticationMW);
 
 // Use Routes
-app.use(AdminstratorRoute);
+app.use(AdministratorRoute);
 app.use(EmployeeRoute);
 
 // Not Found MW
