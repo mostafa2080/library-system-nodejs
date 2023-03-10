@@ -21,9 +21,10 @@ const app = express();
 mongoose.set("strictQuery", true);
 // Db Connection
 mongoose
-    .connect(
-        `${config.db.driver}://${config.db.hostName}:${config.db.portNumber}/${config.db.dbName}`
-    )
+    .connect(config.db.uri)
+    // .connect(
+    //     `${config.db.driver}://${config.db.hostName}:${config.db.portNumber}/${config.db.dbName}`
+    // )
     .then(() => {
         console.log("DB connected");
         // Listening
