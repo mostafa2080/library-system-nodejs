@@ -1,9 +1,6 @@
 {
-    "name":"Library System - Development",
-    "db":{
-        "driver": "mongodb",
-        "hostName": "127.0.0.1",
-        "portNumber": "27017",
-        "dbName" : "librarySystem"
+    "name": "Library System - Development",
+    "db": {
+        "uri": "mongodb://127.0.0.1:27017/librarySystem"
     }
 }
