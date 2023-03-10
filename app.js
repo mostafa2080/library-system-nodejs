@@ -1,7 +1,11 @@
 const express = require("express");
+// "NODE_ENV=development npm start" or "NODE_ENV=production npm start"
+const config = require("config");
 const cors = require("cors");
 const Loggings = require("morgan");
 const mongoose = require("mongoose");
+
+console.log(config.name);
 
 //Routes
 const LoginRoute = require("./Routes/LoginRoute");
@@ -10,14 +14,16 @@ const AdminstratorRoute = require("./Routes/AdminstratorRoute");
 const EmployeeRoute = require("./Routes/EmployeeRoute");
 const BooksRoute = require("./Routes/BooksRoute");
 //Port Connection
-const port = process.env.PORT || 8080; //Used in Listening
+const port = config.port || 8080; //Used in Listening
 const app = express();
 
 // Strict Query Handiling
 mongoose.set("strictQuery", true);
 // Db Connection
 mongoose
-    .connect("mongodb://127.0.0.1:27017/librarySystem")
+    .connect(
+        `${config.db.driver}://${config.db.hostName}:${config.db.portNumber}/${config.db.dbName}`
+    )
     .then(() => {
         console.log("DB connected");
         // Listening
