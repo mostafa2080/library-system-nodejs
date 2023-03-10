@@ -8,7 +8,8 @@ router
     .post(controller.addBook)
     .put(controller.updateBook);
 
-router.get("/books/search", controller.searchBooks);
+// router.get("/books/search", controller.searchBooks);
+router.get("/books/search/:keyword", controller.searchBooks);
 
 router
     .route("/books/id/:_id")
