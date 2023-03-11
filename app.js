@@ -13,7 +13,7 @@ const AuthenticationMW = require("./Core/AuthenticationMw/authenticationMw");
 const AdministratorRoute = require("./Routes/AdministratorRoute");
 const EmployeeRoute = require("./Routes/EmployeeRoute");
 const BooksRoute = require("./Routes/BooksRoute");
-const MembersRoute=require("./Routes/MembersRoute");
+const MembersRoute = require("./Routes/MembersRoute");
 
 //Port Connection
 const port = config.port || 8080; //Used in Listening
@@ -28,7 +28,7 @@ mongoose
     //     `${config.db.driver}://${config.db.hostName}:${config.db.portNumber}/${config.db.dbName}`
     // )
     .then(() => {
-        console.log("DB connected");
+        console.log(`DB connected - ${config.db.name}`);
         // Listening
         app.listen(port, () => {
             console.log(`Listening on port ${port}`);

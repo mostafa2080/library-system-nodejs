@@ -1,6 +1,7 @@
 {
     "name": "Library System - Production",
     "db": {
+        "name":"atlas",
         "uri": "mongodb+srv://0xmosamaa:librarysystempasswordforosama@cluster0.55iic5i.mongodb.net/?retryWrites=true&w=majority"
     }
 }
