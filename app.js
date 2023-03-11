@@ -9,7 +9,7 @@ console.log(config.name);
 
 //Routes
 const LoginRoute = require("./Routes/LoginRoute");
-const AuthenticationMW = require("./Core/AuthenticationMw/AuthenticationMW");
+const AuthenticationMW = require("./Core/AuthenticationMw/authenticationMw");
 const AdministratorRoute = require("./Routes/AdministratorRoute");
 const EmployeeRoute = require("./Routes/EmployeeRoute");
 const BooksRoute = require("./Routes/BooksRoute");

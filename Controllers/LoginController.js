@@ -1,6 +1,6 @@
 const jwt = require("jsonwebtoken");
 const mongoose = require("mongoose");
-require("./../Model/AdministratorModel");
+require("./../Model/administratorModel");
 const bcrypt = require("bcrypt");
 const AdminSchema = mongoose.model("administrators");
 
