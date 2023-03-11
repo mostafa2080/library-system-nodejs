@@ -13,6 +13,8 @@ const AuthenticationMW = require("./Core/AuthenticationMw/AuthenticationMW");
 const AdministratorRoute = require("./Routes/AdministratorRoute");
 const EmployeeRoute = require("./Routes/EmployeeRoute");
 const BooksRoute = require("./Routes/BooksRoute");
+const MembersRoute=require("./Routes/MembersRoute");
+
 //Port Connection
 const port = config.port || 8080; //Used in Listening
 const app = express();
@@ -57,6 +59,7 @@ app.use(AuthenticationMW);
 // Use Routes
 app.use(AdministratorRoute);
 app.use(EmployeeRoute);
+app.use(MembersRoute);
 
 // Not Found MW
 app.use((request, response) => {
