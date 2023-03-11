@@ -1,5 +1,5 @@
 const mongoose = require("mongoose");
-// require('./../Model/administratorModel');
+require('./../Model/administratorModel');
 const fs = require("fs");
 const bcrypt = require("bcrypt");
 const { body } = require("express-validator");
