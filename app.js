@@ -15,6 +15,9 @@ const EmployeeRoute = require("./Routes/EmployeeRoute");
 const BooksRoute = require("./Routes/BooksRoute");
 const MembersRoute = require("./Routes/MembersRoute");
 
+//Report Routes
+const AdministratorReportRoute = require("./Routes/AdminstratorReportRoute");
+
 //Port Connection
 const port = config.port || 8080; //Used in Listening
 const app = express();
@@ -23,20 +26,20 @@ const app = express();
 mongoose.set("strictQuery", true);
 // Db Connection
 mongoose
-    .connect(config.db.uri)
-    // .connect(
-    //     `${config.db.driver}://${config.db.hostName}:${config.db.portNumber}/${config.db.dbName}`
-    // )
-    .then(() => {
-        console.log(`DB connected - ${config.db.name}`);
-        // Listening
-        app.listen(port, () => {
-            console.log(`Listening on port ${port}`);
-        });
-    })
-    .catch((error) => {
-        console.log("Db Problem " + error);
+  .connect(config.db.uri)
+  // .connect(
+  //     `${config.db.driver}://${config.db.hostName}:${config.db.portNumber}/${config.db.dbName}`
+  // )
+  .then(() => {
+    console.log(`DB connected - ${config.db.name}`);
+    // Listening
+    app.listen(port, () => {
+      console.log(`Listening on port ${port}`);
     });
+  })
+  .catch((error) => {
+    console.log("Db Problem " + error);
+  });
 
 // CORS
 app.use(cors());
@@ -48,8 +51,6 @@ app.use(Loggings("dev"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
-// Testing Books
-app.use(BooksRoute);
 //LoginMW
 app.use(LoginRoute);
 
@@ -57,19 +58,23 @@ app.use(LoginRoute);
 app.use(AuthenticationMW);
 
 // Use Routes
-app.use(AdministratorRoute);
-app.use(EmployeeRoute);
+app.use(BooksRoute);
 app.use(MembersRoute);
+app.use(EmployeeRoute);
+app.use(AdministratorRoute);
+
+//Using Report Routes
+app.use(AdministratorReportRoute);
 
 // Not Found MW
 app.use((request, response) => {
-    console.log("Not Found");
-    response.status(404).json({
-        message: "Not Found",
-    });
+  console.log("Not Found");
+  response.status(404).json({
+    message: "Not Found",
+  });
 });
 
 // Error MW
 app.use((error, request, response, next) => {
-    response.status(500).json({ message: error + "" });
+  response.status(500).json({ message: error + "" });
 });
