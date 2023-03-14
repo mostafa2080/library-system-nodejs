@@ -51,6 +51,10 @@ exports.getEmployee = (req, res, next) => {
 
 // Add an Employee
 exports.addEmployee =  (req, res,next) => {
+    if(req.file != undefined){
+        req.body.image = req.file.filename;
+
+    }
     new Employees({
         firstName: req.body.firstName,
         lastName: req.body.lastName,
@@ -58,7 +62,7 @@ exports.addEmployee =  (req, res,next) => {
         password: bcrypt.hashSync(req.body.password, salt),
         birthDate: req.body.birthDate,
         hireDate: req.body.hireDate,
-        image: req.file.filename,
+        image: req.body.image,
         salary: req.body.salary,
         settings: "default",
     })
