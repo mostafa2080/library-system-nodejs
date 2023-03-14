@@ -223,7 +223,11 @@ exports.getReports = (req, res, next) => {
 
 
 exports.searchByFirstName = (req, res, next) => {
-    Employees.find({firstName: req.params.firstName})
+    Employees.find({
+        $or: [
+            { firstName: { $regex: req.params.firstName, $options: "i" } }
+        ]
+    })
     .then((data) => {
         res.status(200).json({ data });
     })
@@ -232,7 +236,11 @@ exports.searchByFirstName = (req, res, next) => {
     });
 }
 exports.searchByLastName = (req, res, next) => {
-    Employees.find({lastName: req.params.lastName})
+    Employees.find({
+        $or: [
+            { lastName: { $regex: req.params.lastName, $options: "i" } }
+        ]
+    })
     .then((data) => {
         res.status(200).json({ data });
     })

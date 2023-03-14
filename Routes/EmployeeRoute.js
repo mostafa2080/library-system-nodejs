@@ -31,6 +31,10 @@ Router.route('/employee/:_id')
     .get(auth.employeeOrAbove,validator.getValidator, Controller.getEmployee)
     .delete(auth.adminOrAbove, validator.deleteValidator, Controller.deleteEmployee);
 
+Router.route('/employee/firstName/:firstName')
+        .get(auth.adminOrAbove, validator.getValidator, Controller.searchByFirstName);
 
+Router.route('/employee/lastName/:lastName')
+        .get(auth.adminOrAbove, validator.getValidator, Controller.searchByLastName);
 
 module.exports = Router;
