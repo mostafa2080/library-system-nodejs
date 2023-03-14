@@ -6,7 +6,7 @@ const router = express.Router();
 router.route("/login/administrator").post(loginController);
 
 router.post(
-  "/employeeLogin",
+  "/login/employee",
   EmployeeValidation.loginValidator,
   EmployeeController.loginEmployee
 );

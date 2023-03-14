@@ -1,12 +1,15 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
+const fs = require('fs');
 
 const saltRounds = 10;
 const salt = bcrypt.genSaltSync(saltRounds);
 
 require('../Model/EmployeeModel');
+require('../Model/EmployeeReportsModel');
 const Employees = mongoose.model('employees');
+const EmployeeReports = mongoose.model('EmployeeReports');
 
 
 // Get all Employees
@@ -47,7 +50,7 @@ exports.getEmployee = (req, res, next) => {
 
 
 // Add an Employee
-exports.addEmployee = (req, res,next) => {
+exports.addEmployee =  (req, res,next) => {
     new Employees({
         firstName: req.body.firstName,
         lastName: req.body.lastName,
@@ -57,10 +60,24 @@ exports.addEmployee = (req, res,next) => {
         hireDate: req.body.hireDate,
         image: req.file.filename,
         salary: req.body.salary,
+        settings: "default",
     })
     .save()
-    .then((data) => {
-        res.status(201).json({ data });
+    .then(async(data) => {
+        EmployeeReports.findOneAndUpdate({ month: new Date().getMonth() + 1, year: new Date().getFullYear() }, {
+            $inc: {
+                newEmp: 1,
+            },
+            $set: {
+                numEmp: await Employees.countDocuments({}),
+            }
+        }, 
+        { 
+            upsert: true, new: true 
+        })
+        .then((data2) => {
+            res.status(201).json({ data });
+        })
     })
     .catch((err) => next(err));
 }
@@ -72,21 +89,29 @@ exports.updateEmployee = (req, res, next) => {
     }
     if(req.file != undefined){
         req.body.image = req.file.filename;
+
     }
+    
     if(req.decodedToken.role == "Employee" && req.body._id == req.decodedToken._id){
         Employees.updateOne({ _id: req.body._id }, {
             $set: {
                 firstName: req.body.firstName,
                 lastName: req.body.lastName,
-                email: req.body.email,
                 password: req.body.password,
                 birthDate: req.body.birthDate,
-                hireDate: req.body.hireDate,
                 image: req.body.image,
-                salary: req.body.salary,
+                settings: "manual",
             }
         })
         .then((data) => {
+            if(req.file != undefined){
+                let path = __dirname + "/../images/Employee/" + data.image;
+                fs.unlink(path, (err) => {
+                if (err) {
+                    console.log(err);
+                }
+                });
+            }
             res.status(200).json({ data });
         })
         .catch((err) => {
@@ -94,7 +119,7 @@ exports.updateEmployee = (req, res, next) => {
         });
     }
     else if(req.decodedToken.role == "Admin" || req.decodedToken.role == "BasicAdmin"){
-        Employees.updateOne({ _id: req.body._id }, {
+        Employees.findOneAndUpdate({ _id: req.body._id }, {
             $set: {
                 firstName: req.body.firstName,
                 lastName: req.body.lastName,
@@ -107,6 +132,14 @@ exports.updateEmployee = (req, res, next) => {
             }
         })
         .then((data) => {
+            if(req.file != undefined){
+                let path = __dirname + "/../images/Employee/" + data.image;
+                fs.unlink(path, (err) => {
+                if (err) {
+                    console.log(err);
+                }
+                });
+            }
             res.status(200).json({ data });
         })
         .catch((err) => {
@@ -121,9 +154,28 @@ exports.updateEmployee = (req, res, next) => {
 
 // Delete an Employee
 exports.deleteEmployee = (req, res, next) => {
-    Employees.deleteOne({ _id: req.params._id })
-    .then((data) => {
-        res.status(200).json({ data });
+    Employees.findOneAndDelete({ _id: req.params._id })
+    .then(async(data) => {
+        let path = __dirname + "/../images/Employee/" + data.image;
+        fs.unlink(path, (err) => {
+            if (err) {
+                console.log(err);
+            }
+        });
+        EmployeeReports.findOneAndUpdate({ month: new Date().getMonth() + 1, year: new Date().getFullYear() }, {
+            $inc: {
+                numEmpLeave: 1,
+            },
+            $set: {
+                numEmp: await Employees.countDocuments({}),
+            }
+        },
+        {
+            upsert: true, new: true
+        })
+        .then((data2) => {
+            res.status(200).json({ data });
+        })
     })
     .catch((err) => {
         next(err);
@@ -157,3 +209,44 @@ exports.loginEmployee = (req, res, next) => {
         next(err);
     });
 }
+
+
+exports.getReports = (req, res, next) => {
+    EmployeeReports.find()
+    .then((data) => {
+        res.status(200).json({ data });
+    })
+    .catch((err) => {
+        next(err);
+    });
+}
+
+
+exports.searchByFirstName = (req, res, next) => {
+    Employees.find({
+        $or: [
+            { firstName: { $regex: req.params.firstName, $options: "i" } }
+        ]
+    })
+    .then((data) => {
+        res.status(200).json({ data });
+    })
+    .catch((err) => {
+        next(err);
+    });
+}
+exports.searchByLastName = (req, res, next) => {
+    Employees.find({
+        $or: [
+            { lastName: { $regex: req.params.lastName, $options: "i" } }
+        ]
+    })
+    .then((data) => {
+        res.status(200).json({ data });
+    })
+    .catch((err) => {
+        next(err);
+    });
+}
+
+
