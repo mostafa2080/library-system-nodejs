@@ -20,9 +20,17 @@ Router.route('/employee')
         setImage
         ,validator.editValidator, Controller.updateEmployee);
 
+        
+
+Router.route('/employee/reports')
+    .get(auth.adminOrAbove, Controller.getReports)
+
+
+
 Router.route('/employee/:_id')
     .get(auth.employeeOrAbove,validator.getValidator, Controller.getEmployee)
     .delete(auth.adminOrAbove, validator.deleteValidator, Controller.deleteEmployee);
+
 
 
 module.exports = Router;
