@@ -24,25 +24,6 @@ exports.getBook = async (req, res, next) => {
 };
 
 exports.addBook = async (req, res, next) => {
-    // if (
-    //     !(
-    //         req.decodedToken.role == "Admin" ||
-    //         req.decodedToken.role == "BasicAdmin"
-    //     )
-    // ) {
-    //     res.status(401).json({ message: "Unauthorized" });
-    //     return;
-    // }
-    if (
-        !(
-            req.decodedToken.role == "Admin" ||
-            req.decodedToken.role == "BasicAdmin"
-        )
-    ) {
-        res.status(401).json({ message: "Unauthorized" });
-        return;
-    }
-
     try {
         const book = await new Books({
             title: req.body.title,
@@ -64,16 +45,6 @@ exports.addBook = async (req, res, next) => {
 };
 
 exports.updateBook = async (req, res, next) => {
-    if (
-        !(
-            req.decodedToken.role == "Admin" ||
-            req.decodedToken.role == "BasicAdmin"
-        )
-    ) {
-        res.status(401).json({ message: "Unauthorized" });
-        return;
-    }
-
     try {
         const book = await Books.updateOne(
             { _id: req.params._id },
@@ -100,15 +71,6 @@ exports.updateBook = async (req, res, next) => {
 };
 
 exports.deleteBook = async (req, res, next) => {
-    if (
-        !(
-            req.decodedToken.role == "Admin" ||
-            req.decodedToken.role == "BasicAdmin"
-        )
-    ) {
-        res.status(401).json({ message: "Unauthorized" });
-        return;
-    }
     try {
         const book = await Books.deleteOne({ _id: req.params._id });
         if (book.deletedCount == 0) next(new Error("Book not found 💩"));
