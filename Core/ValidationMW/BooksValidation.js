@@ -56,7 +56,7 @@ exports.addValidator = [
 ];
 
 exports.editValidator = [
-    body("_id").isMongoId().withMessage("Enter a valid ID"),
+    param("_id").isMongoId().withMessage("Enter a valid ID"),
     body("title")
         .isString()
         .isLength({ min: 1, max: 100 })
