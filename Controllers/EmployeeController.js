@@ -58,7 +58,7 @@ exports.addEmployee =  (req, res,next) => {
         password: bcrypt.hashSync(req.body.password, salt),
         birthDate: req.body.birthDate,
         hireDate: req.body.hireDate,
-        image: req.file.filename,
+        image: req.body.image,
         salary: req.body.salary,
         settings: "default",
     })

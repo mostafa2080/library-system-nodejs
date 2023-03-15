@@ -16,3 +16,11 @@ exports.employeeOrAbove = (req, res, next) =>{
     else
         next(new Error("UnAuthorized"));
 }
+
+exports.memberOrAbove = (request,response,next)=>{
+    if(request.decodedToken.role == "Member" || request.decodedToken.role == "Employee" || request.decodedToken.role == "Admin" || request.decodedToken.role == "BasicAdmin"){
+        next();
+    }else{
+        next(new Error("UnAuthorized"));
+    }
+}

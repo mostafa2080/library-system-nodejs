@@ -19,6 +19,15 @@ const schema=new mongoose.Schema({
         city:{type:String},
         street:{type:String},
         building:{type:String}
+    },
+    firstLogin:{
+        type:Boolean,
+        default:"true"
+    },
+    isPanned:{
+        type:Boolean,
+        required:false,
+
     }
 })
 
