@@ -33,6 +33,15 @@ exports.addBook = async (req, res, next) => {
     //     res.status(401).json({ message: "Unauthorized" });
     //     return;
     // }
+    if (
+        !(
+            req.decodedToken.role == "Admin" ||
+            req.decodedToken.role == "BasicAdmin"
+        )
+    ) {
+        res.status(401).json({ message: "Unauthorized" });
+        return;
+    }
 
     try {
         const book = await new Books({
@@ -91,6 +100,15 @@ exports.updateBook = async (req, res, next) => {
 };
 
 exports.deleteBook = async (req, res, next) => {
+    if (
+        !(
+            req.decodedToken.role == "Admin" ||
+            req.decodedToken.role == "BasicAdmin"
+        )
+    ) {
+        res.status(401).json({ message: "Unauthorized" });
+        return;
+    }
     try {
         const book = await Books.deleteOne({ _id: req.params._id });
         if (book.deletedCount == 0) next(new Error("Book not found 💩"));
@@ -103,49 +121,6 @@ exports.deleteBook = async (req, res, next) => {
 };
 
 exports.searchBooks = async (req, res, next) => {
-    // Search through one and only one field from title or author or publisher
-    
-    // if (req.query.title) {
-    //     try {
-    //         const books = await Books.find({});
-    //         const searchResults = books.filter((book) => {
-    //             return book.title
-    //                 .toLowerCase()
-    //                 .includes(req.query.title.toLowerCase());
-    //         });
-    //         res.status(200).json({ searchResults });
-    //     } catch (err) {
-    //         next(err);
-    //     }
-    // } else if (req.query.author) {
-    //     try {
-    //         const books = await Books.find({});
-    //         const searchResults = books.filter((book) => {
-    //             return book.author
-    //                 .toLowerCase()
-    //                 .includes(req.query.author.toLowerCase());
-    //         });
-    //         res.status(200).json({ searchResults });
-    //     } catch (err) {
-    //         next(err);
-    //     }
-    // } else if (req.query.publisher) {
-    //     try {
-    //         const books = await Books.find({});
-    //         const searchResults = books.filter((book) => {
-    //             return book.publisher
-    //                 .toLowerCase()
-    //                 .includes(req.query.publisher.toLowerCase());
-    //         });
-    //         res.status(200).json({ searchResults });
-    //     } catch (err) {
-    //         next(err);
-    //     }
-    // } else {
-    //     res.status(400).json({ message: "Bad Request 🦥" });
-    // }
-
-    // Search through title, author, publisher with keyword
     try {
         const searchResultbooks = await Books.find({
             $or: [
