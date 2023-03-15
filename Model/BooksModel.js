@@ -42,7 +42,7 @@ const booksSchema = new mongoose.Schema({
         type: Number,
         required: [true, "Why no pages count? 😭"],
         min: [1, "Pages count is too small 😒"],
-        max: [1800, "Category name is too big 😣"],
+        max: [1800, "Pages count is too high 😣"],
     },
     copiesCount: {
         type: Number,

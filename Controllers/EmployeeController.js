@@ -51,6 +51,10 @@ exports.getEmployee = (req, res, next) => {
 
 // Add an Employee
 exports.addEmployee =  (req, res,next) => {
+    if(req.file != undefined){
+        req.body.image = req.file.filename;
+
+    }
     new Employees({
         firstName: req.body.firstName,
         lastName: req.body.lastName,

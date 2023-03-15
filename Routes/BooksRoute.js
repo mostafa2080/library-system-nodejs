@@ -1,19 +1,29 @@
 const express = require("express");
-const controller = require("../Controllers/BooksController");
 const router = express.Router();
+const controller = require("../Controllers/BooksController");
+const validator = require("../Core/ValidationMW/BookValidation");
+const auth = require("../Core/AuthenticationMw/Authorization");
 
 router
     .route("/books")
     .get(controller.getAllBooks)
-    .post(controller.addBook)
-    .put(controller.updateBook);
+    .post(auth.adminOrAbove, validator.addValidator, controller.addBook)
+    .put(auth.adminOrAbove, validator.editValidator, controller.updateBook);
 
 // router.get("/books/search", controller.searchBooks);
-router.get("/books/search/:keyword", controller.searchBooks);
+router.get(
+    "/books/search/:keyword",
+    validator.searchValidator,
+    controller.searchBooks
+);
 
 router
     .route("/books/id/:_id")
-    .get(controller.getBook)
-    .delete(controller.deleteBook);
+    .get(validator.getValidator, controller.getBook)
+    .delete(
+        auth.adminOrAbove,
+        validator.deleteValidator,
+        controller.deleteBook
+    );
 
 module.exports = router;
