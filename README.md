@@ -1,7 +1,7 @@
 
 # Library System
 
-This is a library system built in Node.js, designed to manage books and their respective authors. The system allows users to search, add, update, and delete books and authors in a database.
+This is a library system built in Node.js, designed to manage books and their respective borrowers and readers. The system allows users to search, add, get, update, and delete books and users in a nosql database.
 
 
 
