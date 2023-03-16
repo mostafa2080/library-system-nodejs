@@ -4,7 +4,7 @@ const config = require("config");
 const cors = require("cors");
 const Loggings = require("morgan");
 const mongoose = require("mongoose");
-// const checkDeadlines = require("./cron").checkDeadlines;
+const checkDeadlines = require("./cron").checkDeadlines;
 
 console.log(config.name);
 
