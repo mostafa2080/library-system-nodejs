@@ -8,7 +8,7 @@ exports.checkDeadlines = () => {
         const d = new Date();
 
         borrowsCheckCycle();
-        console.log("Every tenth minute:", d);
+        console.log("Every tenth minute:", d.toLocaleString());
         // console.log(count[0]);
         // console.log(count[1]);
         console.log("Check done!");
