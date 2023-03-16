@@ -26,20 +26,21 @@ exports.getBorrow = async (req, res, next) => {
 };
 
 exports.addBorrow = async (req, res, next) => {
+    const continueWithBorrow = await canBorrow(req, res, next);
+    if (!continueWithBorrow) {
+        res.status(403).json({
+            message: "Can't borrow.",
+        });
+        return;
+    }
     try {
-        if (!canBorrow(req, res, next)) {
-            res.status(403).json({
-                message: "Forbidden request. Book is not available.",
-            });
-            return;
-        }
         const date = new Date();
         const twoDaysDeadlineDate = date.setDate(date + 2);
         const result = await new Borrows({
             bookID: req.body.bookID,
             memberID: req.body.memberID,
             employeeID: req.body.employeeID,
-            borrowDate: date,
+            borrowDate: date.now,
             returnDate: null,
             deadlineDate: req.body.deadlineDate || twoDaysDeadlineDate,
         }).save();
@@ -57,19 +58,18 @@ exports.addBorrow = async (req, res, next) => {
 };
 exports.updateBorrow = async (req, res, next) => {
     try {
-        const result = await Borrows.updateOne(
+        const result = await Borrows.findOneAndUpdate(
             { _id: req.params._id },
             {
                 $set: {
                     bookID: req.body.bookID,
                     memberID: req.body.memberID,
-                    //TODO change this to logged in employee ID
                     employeeID: req.body.employeeID,
-                    borrowDate: req.body.borrowDate,
                     returnDate: req.body.returnDate,
                     deadlineDate: req.body.deadlineDate,
                 },
-            }
+            },
+            { new: true }
         );
         res.status(200).json({ result });
     } catch (err) {
@@ -95,20 +95,27 @@ const canBorrow = async (req, res, next) => {
         isAvailable: true,
     });
 
-    if (book.length === 0) return false;
+    if (!book) return false;
 
     const member = await Members.findOne({
         _id: req.body.memberID,
         isBanned: false,
     });
 
-    if (member.length === 0) return false;
-
+    if (!member) return false;
+    const unreturnedBorrows = await unreturnedBorrowsOfSameBookCount(
+        req,
+        res,
+        next
+    );
+    const copiesCount = await totalCurrentlyBorrowedCopiesOfBookCount(
+        req,
+        res,
+        next
+    );
     if (
-        unreturnedBorrowsOfSameBookCount(req, res, next) === 0 &&
-        book.copiesCount -
-            totalCurrentlyBorrowedCopiesOfBookCount(req, res, next) >
-            1 &&
+        unreturnedBorrows === 0 &&
+        book.copiesCount - copiesCount > 1 &&
         !member.isBanned
     ) {
         return true;
@@ -131,40 +138,63 @@ const totalCurrentlyBorrowedCopiesOfBookCount = async (req, res, next) => {
 };
 
 exports.bansCheckCycle = async () => {
-    const date = new Date();
-    let banCount = 0;
-    let unbanCount = 0;
-    const unreturnedBorrows = await Borrows.find({
-        $where: "this.borrowDate>=this.returnDate&&this.returnDate>=this.deadlineDate",
-    });
-    unreturnedBorrows.forEach(async (borrow) => {
-        if (borrow.returnDate.setDate(borrow.returnDate + 7) < date) {
-            await Members.updateOne(
+    const date = new Date().toISOString();
+    try {
+        const unreturnedBorrows = await Borrows.find({
+            returnDate: null,
+            $expr: { $lt: ["$deadlineDate", date] },
+        });
+
+        unreturnedBorrows.forEach(async (borrow) => {
+            const result = await Members.findOneAndUpdate(
                 {
-                    _id: borrow._id,
-                },
-                {
-                    $set: {
-                        isBanned: false,
-                    },
-                }
-            );
-            unbanCount++;
-        } else {
-            await Members.updateOne(
-                {
-                    _id: borrow._id,
+                    _id: borrow.memberID,
                 },
                 {
                     $set: {
                         isBanned: true,
                     },
-                }
+                },
+                { new: true }
             );
-            banCount++;
-        }
-    });
-    console.log("Today's ban count:", banCount);
-    console.log("Today's unban count", unbanCount);
+        });
+    } catch (err) {
+        console.log(err);
+    }
+    try {
+        const returnedBorrowsAfterDeadline = await Borrows.find({
+            $expr: { $gt: ["$returnDate", "$deadlineDate"] },
+        });
 
+        returnedBorrowsAfterDeadline.forEach(async (borrow) => {
+            if (borrow.returnDate.setDate(borrow.returnDate + 7) > date) {
+                const result = await Members.findOneAndUpdate(
+                    {
+                        _id: borrow.memberID,
+                    },
+                    {
+                        $set: {
+                            isBanned: true,
+                        },
+                    },
+                    { new: true }
+                );
+            } else {
+                const result = await Members.findOneAndUpdate(
+                    {
+                        _id: borrow.memberID,
+                    },
+                    {
+                        $set: {
+                            isBanned: false,
+                        },
+                    },
+                    { new: true }
+                );
+            }
+        });
+    } catch (err) {
+        console.log(err);
+    }
+    console.log("Ban/unban cycle complete.");
 };
