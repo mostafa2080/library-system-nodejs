@@ -23,17 +23,19 @@ exports.getAllAdministrators = (req, res, next) => {
 exports.getAdministrator = (req, res, next) => {
   if (
     req.decodedToken.role === "Admin" &&
-    req.body.email === req.decodedToken.email
+    req.params.email === req.decodedToken.email
   ) {
-    AdministratorsSchema.find({ email: req.decodedToken.email })
+    AdministratorsSchema.find({ email: req.params.email })
       .then((data) => {
-        res.status(200).json({ data });
+        if (data.length !== 0) res.status(200).json({ data });
+        else throw new Error("Administrator Is Not Found");
       })
       .catch((error) => next(error));
   } else if (req.decodedToken.role === "BasicAdmin") {
-    AdministratorsSchema.find({ email: req.body.email })
+    AdministratorsSchema.find({ email: req.params.email })
       .then((data) => {
-        res.status(200).json({ data });
+        if (data.length !== 0) res.status(200).json({ data });
+        else throw new Error("Administrator Is Not Found");
       })
       .catch((error) => next(error));
   } else next(new Error("Can't Get Data About Any Other Admins Except Yours"));
@@ -45,14 +47,16 @@ exports.addAdministrator = (req, res, next) => {
   new AdministratorsSchema({
     email: req.body.email,
     password: bcrypt.hashSync(req.body.password, salt),
-    hireDate: new Date(),
+    hireDate: date,
     salary: req.body.salary,
+    setting: "default",
   })
     .save()
-    .then(async (data) => {
-      let currentMonth = new Date().getMonth();
+    .then((data) => {
+      let currentMonth = date.getMonth();
+      let currentYear = date.getFullYear();
       AdministratorReportSchema.updateOne(
-        { Date: currentMonth },
+        { month: currentMonth, year: currentYear },
         {
           $inc: {
             administratorsNumber: 1,
@@ -65,7 +69,7 @@ exports.addAdministrator = (req, res, next) => {
         .then(() => res.status(201).json({ data }))
         .catch((error) => next(error));
     })
-    .catch((err) => next(err));
+    .catch((error) => next(error));
 };
 
 //Update a Administrator
@@ -117,7 +121,7 @@ exports.updateAdministrator = async (req, res, next) => {
       .then((data) => {
         if (data === null) next(new Error("Administrator not found"));
         else {
-          if (data["image"] != null)
+          if (data["image"] !== null)
             fs.unlink(data["image"], (error) => next(error));
           res.status(200).json({ data });
         }
@@ -127,27 +131,24 @@ exports.updateAdministrator = async (req, res, next) => {
 };
 
 // Delete a Administrator
-exports.deleteAdministrator = async (req, res, next) => {
+exports.deleteAdministrator = (req, res, next) => {
   AdministratorsSchema.findOneAndDelete({
-    email: req.body.email,
+    email: req.params.email,
   })
     .then((data) => {
-      if (data === null) next(new Error("Administrator not found"));
+      if (data === null) throw new Error("Administrator not found");
       else {
         if (data["image"] !== null)
           fs.unlink(data["image"], (error) => next(error));
 
         let currentMonth = new Date().getMonth();
+        let currentYear = new Date().getFullYear();
         AdministratorReportSchema.updateOne(
-          { Date: currentMonth },
+          { month: currentMonth, year: currentYear },
           {
             $inc: {
               existingAdministratorsNumber: -1,
               deletedAdministratorsNumber: 1,
-            },
-            $set: {
-              year: new Date().getFullYear(),
-              month: new Date().getMonth(),
             },
           },
           { upsert: true, new: true }
@@ -156,5 +157,5 @@ exports.deleteAdministrator = async (req, res, next) => {
           .catch((error) => next(error));
       }
     })
-    .catch((err) => next(err));
+    .catch((error) => next(error));
 };

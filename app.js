@@ -73,7 +73,7 @@ app.use(AdministratorReportRoute);
 app.use((request, response) => {
   console.log("Not Found");
   response.status(404).json({
-    message: "Not Found",
+    message: "Page Not Found",
   });
 });
 
