@@ -41,11 +41,11 @@ exports.getAdministrator = (req, res, next) => {
 
 // Add a Administrator
 exports.addAdministrator = (req, res, next) => {
-  let date = new Date().toJSON();
+  let date = new Date();
   new AdministratorsSchema({
     email: req.body.email,
     password: bcrypt.hashSync(req.body.password, salt),
-    hireDate: date,
+    hireDate: new Date(),
     salary: req.body.salary,
   })
     .save()
@@ -54,11 +54,13 @@ exports.addAdministrator = (req, res, next) => {
       AdministratorReportSchema.updateOne(
         { Date: currentMonth },
         {
-          administratorsNumber: { $inc: 1 },
-          TotalExistedAdministratorsNumber: { $inc: 1 },
-          existingAdministratorsNumber: { $inc: 1 },
+          $inc: {
+            administratorsNumber: 1,
+            TotalExistedAdministratorsNumber: 1,
+            existingAdministratorsNumber: 1,
+          },
         },
-        { upsert: true }
+        { upsert: true, new: true }
       )
         .then(() => res.status(201).json({ data }))
         .catch((error) => next(error));
@@ -139,12 +141,16 @@ exports.deleteAdministrator = async (req, res, next) => {
         AdministratorReportSchema.updateOne(
           { Date: currentMonth },
           {
-            TotalExistedAdministratorsNumber: { $inc: -1 },
-            existingAdministratorsNumber: { $inc: -1 },
-            deletedAdministratorsNumber: { $inc: 1 },
-            TotalDeletedAdministratorsNumber: { $inc: 1 },
+            $inc: {
+              existingAdministratorsNumber: -1,
+              deletedAdministratorsNumber: 1,
+            },
+            $set: {
+              year: new Date().getFullYear(),
+              month: new Date().getMonth(),
+            },
           },
-          { upsert: true }
+          { upsert: true, new: true }
         )
           .then(() => res.status(201).json({ data }))
           .catch((error) => next(error));

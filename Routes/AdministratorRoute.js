@@ -17,7 +17,7 @@ router
     basicAdmin,
     uploadImg("Administrator").single("image"),
     setImage,
-    validateAdministrator.validateAdministratorArray,
+    validateAdministrator.addValidationArray,
     validateMW,
     AdministratorController.addAdministrator
   )
@@ -25,13 +25,13 @@ router
     basicAdmin,
     uploadImg("Administrator").single("image"),
     setImage,
-    validateAdministrator.optValidateAdministratorArray,
+    validateAdministrator.updateValidationArray,
     validateMW,
     AdministratorController.updateAdministrator
   )
   .delete(
     basicAdmin,
-    validateAdministrator.optValidateAdministratorArray,
+    validateAdministrator.deleteValidationArray,
     validateMW,
     AdministratorController.deleteAdministrator
   );
@@ -40,7 +40,7 @@ router
   .route("/administrators/:email")
   .get(
     adminOrAbove,
-    validateAdministrator.optValidateAdministratorArray,
+    validateAdministrator.getValidationArray,
     validateMW,
     AdministratorController.getAdministrator
   );

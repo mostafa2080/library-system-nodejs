@@ -5,14 +5,6 @@ const schema = new mongoose.Schema({
     type: Number,
     required: [true, "Administrators Number iS Needed"],
   },
-  TotalExistedAdministratorsNumber: {
-    type: Number,
-    required: [true, "Existing Administrators Number iS Needed"],
-  },
-  TotalDeletedAdministratorsNumber: {
-    type: Number,
-    required: [true, "Deleted Adminsitrators Number iS Needed"],
-  },
   existingAdministratorsNumber: {
     type: Number,
     required: [true, "Existing Administrators Number iS Needed"],
@@ -21,8 +13,12 @@ const schema = new mongoose.Schema({
     type: Number,
     required: [true, "Deleted Adminsitrators Number iS Needed"],
   },
-  reportMonth: {
-    type: String,
+  year: {
+    type: Number,
+    required: [true, "Current Year iS Needed"],
+  },
+  month: {
+    type: Number,
     required: [true, "Current Month iS Needed"],
   },
 });
