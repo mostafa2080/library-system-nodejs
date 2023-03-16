@@ -71,6 +71,15 @@ exports.updateBook = async (req, res, next) => {
 };
 
 exports.deleteBook = async (req, res, next) => {
+    if (
+        !(
+            req.decodedToken.role == "Admin" ||
+            req.decodedToken.role == "BasicAdmin"
+        )
+    ) {
+        res.status(401).json({ message: "Unauthorized" });
+        return;
+    }
     try {
         const book = await Books.deleteOne({ _id: req.params._id });
         if (book.deletedCount == 0) next(new Error("Book not found 💩"));
