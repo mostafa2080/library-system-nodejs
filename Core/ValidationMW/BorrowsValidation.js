@@ -34,7 +34,6 @@ exports.editValidator = [
     body("borrowDate")
         .isDate()
         .trim()
-        .default(Date.now)
         .withMessage("Borrow date is not valid"),
     body("returnDate").isDate().trim().withMessage("Return date is not valid"),
     body("deadlineDate")
