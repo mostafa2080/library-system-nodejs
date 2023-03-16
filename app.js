@@ -4,6 +4,7 @@ const config = require("config");
 const cors = require("cors");
 const Loggings = require("morgan");
 const mongoose = require("mongoose");
+const checkDeadlines = require("./cron").checkDeadlines;
 
 console.log(config.name);
 
@@ -26,20 +27,22 @@ const app = express();
 mongoose.set("strictQuery", true);
 // Db Connection
 mongoose
-  .connect(config.db.uri)
-  // .connect(
-  //     `${config.db.driver}://${config.db.hostName}:${config.db.portNumber}/${config.db.dbName}`
-  // )
-  .then(() => {
-    console.log(`DB connected - ${config.db.name}`);
-    // Listening
-    app.listen(port, () => {
-      console.log(`Listening on port ${port}`);
+    .connect(config.db.uri)
+    // .connect(
+    //     `${config.db.driver}://${config.db.hostName}:${config.db.portNumber}/${config.db.dbName}`
+    // )
+    .then(() => {
+        console.log(`DB connected - ${config.db.name}`);
+        // Listening
+        app.listen(port, () => {
+            console.log(`Listening on port ${port}`);
+        });
+        // Check to see if members need to be banned or unbanned
+        checkDeadlines();
+    })
+    .catch((error) => {
+        console.log("Db Problem " + error);
     });
-  })
-  .catch((error) => {
-    console.log("Db Problem " + error);
-  });
 
 // CORS
 app.use(cors());
@@ -68,13 +71,13 @@ app.use(AdministratorReportRoute);
 
 // Not Found MW
 app.use((request, response) => {
-  console.log("Not Found");
-  response.status(404).json({
-    message: "Not Found",
-  });
+    console.log("Not Found");
+    response.status(404).json({
+        message: "Not Found",
+    });
 });
 
 // Error MW
 app.use((error, request, response, next) => {
-  response.status(500).json({ message: error + "" });
+    response.status(500).json({ message: error + "" });
 });
