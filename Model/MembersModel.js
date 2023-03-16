@@ -30,7 +30,8 @@ const schema=new mongoose.Schema({
     },
     isBanned:{
         type:Boolean,
-        required:false,
+        required:true,
+        default: false
     }
 })
 

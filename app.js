@@ -14,6 +14,7 @@ const AuthenticationMW = require("./Core/AuthenticationMw/authenticationMw");
 const AdministratorRoute = require("./Routes/AdministratorRoute");
 const EmployeeRoute = require("./Routes/EmployeeRoute");
 const BooksRoute = require("./Routes/BooksRoute");
+const BorrowsRoute = require("./Routes/BorrowsRoute");
 const MembersRoute = require("./Routes/MembersRoute");
 
 //Report Routes
@@ -62,6 +63,7 @@ app.use(AuthenticationMW);
 
 // Use Routes
 app.use(BooksRoute);
+app.use(BorrowsRoute);
 app.use(MembersRoute);
 app.use(EmployeeRoute);
 app.use(AdministratorRoute);
