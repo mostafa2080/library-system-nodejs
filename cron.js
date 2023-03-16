@@ -3,7 +3,7 @@ const borrowsCheckCycle =
     require("./Controllers/BorrowsController").bansCheckCycle;
 
 exports.checkDeadlines = () => {
-    const job = new CronJob("* */10 * * * *", function () {
+    const job = new CronJob("*/10 * * * *", function () {
         console.log("Checking to ban members...");
         const d = new Date();
 
