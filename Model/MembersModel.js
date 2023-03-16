@@ -24,7 +24,7 @@ const schema=new mongoose.Schema({
         type:Boolean,
         default:"true"
     },
-    isPanned:{
+    isBanned:{
         type:Boolean,
         required:false,
 
