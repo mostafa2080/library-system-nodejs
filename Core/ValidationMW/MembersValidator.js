@@ -2,7 +2,7 @@ const {body,param,query}=require("express-validator");
 
 exports.memberPostValidator=[
     body("_id").notEmpty().withMessage("ID Field Required...!")
-        .isNumeric().withMessage("ID must be a Numeric Value...!"),
+        .isMongoId().withMessage("ID must be a Object ID...!"),
     body("fullName").notEmpty().withMessage("FullName Field Required...!")
         .isString().withMessage("FullName must be string"),
     body("email").notEmpty().withMessage("Email Required...!")
@@ -21,7 +21,7 @@ exports.memberPostValidator=[
 
 exports.memberPutValidator=[
     body("_id").notEmpty().withMessage("ID Field Required...!")
-        .isNumeric().withMessage("ID must be a Numeric Value...!"),
+        .isMongoId().withMessage("ID must be a Object ID...!"),
     body("fullName").optional().notEmpty().withMessage("FullName Field Required...!")
         .isString().withMessage("FullName must be string"),
     body("email").optional().notEmpty().withMessage("Email Required...!")
@@ -40,13 +40,13 @@ exports.memberPutValidator=[
 
 exports.memberDeleteValidator=[
     param("_id").notEmpty().withMessage("ID parameter required...!")
-        .isNumeric().withMessage("ID must be Number...!")
+        .isMongoId().withMessage("ID must be Object ID...!")
 ];
 /***************** Member Validation Array for Delete Request ******************/
 
 exports.getOneMember=[
     param("_id").notEmpty().withMessage("ID parameter required...!")
-        .isNumeric().withMessage("ID must be Number...!")
+        .isMongoId().withMessage("ID must be Object ID...!")
 ];
 /***************** Member Validation Array for Get One Member Request ******************/
 
