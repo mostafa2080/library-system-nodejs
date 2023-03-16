@@ -26,20 +26,20 @@ exports.getBorrow = async (req, res, next) => {
 };
 
 exports.addBorrow = async (req, res, next) => {
+    if (!canBorrow(req, res, next)) {
+        res.status(403).json({
+            message: "Forbidden request. Book is not available.",
+        });
+        return;
+    }
     try {
-        if (!canBorrow(req, res, next)) {
-            res.status(403).json({
-                message: "Forbidden request. Book is not available.",
-            });
-            return;
-        }
         const date = new Date();
         const twoDaysDeadlineDate = date.setDate(date + 2);
         const result = await new Borrows({
             bookID: req.body.bookID,
             memberID: req.body.memberID,
             employeeID: req.body.employeeID,
-            borrowDate: date,
+            borrowDate: date.now,
             returnDate: null,
             deadlineDate: req.body.deadlineDate || twoDaysDeadlineDate,
         }).save();
@@ -90,20 +90,27 @@ exports.deleteBorrow = async (req, res, next) => {
 };
 
 const canBorrow = async (req, res, next) => {
+    console.log("check");
     const book = await Books.findOne({
         _id: req.body.bookID,
         isAvailable: true,
     });
+    console.log(book);
 
-    if (book.length === 0) return false;
-
+    if (!book) return false;
+    console.log("book found")
+    
     const member = await Members.findOne({
         _id: req.body.memberID,
         isBanned: false,
     });
+    console.log(member);
+    
+    if (!member) return false;
+    console.log("member found")
 
-    if (member.length === 0) return false;
-
+    console.log(book);
+    console.log(member);
     if (
         unreturnedBorrowsOfSameBookCount(req, res, next) === 0 &&
         book.copiesCount -
@@ -131,13 +138,33 @@ const totalCurrentlyBorrowedCopiesOfBookCount = async (req, res, next) => {
 };
 
 exports.bansCheckCycle = async () => {
+    return;
     const date = new Date();
     let banCount = 0;
     let unbanCount = 0;
     const unreturnedBorrows = await Borrows.find({
-        $where: "this.borrowDate>=this.returnDate&&this.returnDate>=this.deadlineDate",
+        // TODO test this
+        // $where: `(this.returnDate>this.deadlineDate)||(this.returnDate==null&&${date}>this.deadlineDate)`
+        $or: {
+            $expr: { $gt: ["$returnDate", "$deadlineDate"] },
+            $and: {
+                $expr: { $eq: ["$returnDate", null] },
+                $expr: { $gt: [date, "$deadlineDate"] },
+            },
+        },
     });
     unreturnedBorrows.forEach(async (borrow) => {
+        await Members.updateOne(
+            {
+                _id: borrow._id,
+            },
+            {
+                $set: {
+                    isBanned: true,
+                },
+            }
+        );
+        banCount++;
         if (borrow.returnDate.setDate(borrow.returnDate + 7) < date) {
             await Members.updateOne(
                 {
@@ -150,21 +177,8 @@ exports.bansCheckCycle = async () => {
                 }
             );
             unbanCount++;
-        } else {
-            await Members.updateOne(
-                {
-                    _id: borrow._id,
-                },
-                {
-                    $set: {
-                        isBanned: true,
-                    },
-                }
-            );
-            banCount++;
         }
     });
     console.log("Today's ban count:", banCount);
     console.log("Today's unban count", unbanCount);
-
 };
