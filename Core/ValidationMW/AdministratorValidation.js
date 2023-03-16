@@ -1,6 +1,6 @@
-const { body } = require("express-validator");
+const { body, param } = require("express-validator");
 exports.getValidationArray = [
-  body("email")
+  param("email")
     .isEmail()
     .withMessage("Administrator Email must be a valid Email"),
 ];
@@ -52,7 +52,7 @@ exports.updateValidationArray = [
     .withMessage("Administrator Salary must be a Number"),
 ];
 exports.deleteValidationArray = [
-  body("email")
+  param("email")
     .isEmail()
     .withMessage("Administrator Email must be a valid Email"),
 ];

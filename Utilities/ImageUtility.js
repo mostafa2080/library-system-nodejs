@@ -14,6 +14,7 @@ exports.uploadImg = (Routepath) => {
         callBack(new Error("Add a valid Image"));
       }
     },
+    limits: { fileSize: 1024 * 1024 }, // 1 MB
     storage: multer.diskStorage({
       destination: (req, file, callBack) => {
         callBack(null, path.join(__dirname, "..", "images", Routepath));

@@ -15,8 +15,6 @@ router
   .get(basicAdmin, AdministratorController.getAllAdministrators)
   .post(
     basicAdmin,
-    uploadImg("Administrator").single("image"),
-    setImage,
     validateAdministrator.addValidationArray,
     validateMW,
     AdministratorController.addAdministrator
@@ -28,12 +26,6 @@ router
     validateAdministrator.updateValidationArray,
     validateMW,
     AdministratorController.updateAdministrator
-  )
-  .delete(
-    basicAdmin,
-    validateAdministrator.deleteValidationArray,
-    validateMW,
-    AdministratorController.deleteAdministrator
   );
 
 router
@@ -43,6 +35,12 @@ router
     validateAdministrator.getValidationArray,
     validateMW,
     AdministratorController.getAdministrator
+  )
+  .delete(
+    basicAdmin,
+    validateAdministrator.deleteValidationArray,
+    validateMW,
+    AdministratorController.deleteAdministrator
   );
 
 module.exports = router;
