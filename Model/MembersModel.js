@@ -1,11 +1,15 @@
 const mongoose=require("mongoose");
+var Schema = mongoose.Schema,
+ObjectId = Schema.ObjectId;
+
 const schema=new mongoose.Schema({
-    _id:Number,
-    fullName:{type:String,required:true},
+    _id:ObjectId,
+    fullName:{type:String,required:true,minLength:8},
     email:{
         type:String,
         required:true,
-        match:/^\w+([\.-]?\w+)@\w+([\.-]?\w+)(\.\w{2,3})+$/
+        match:/^\w+([\.-]?\w+)@\w+([\.-]?\w+)(\.\w{2,3})+$/,
+        unique:true
     },
     password:{type:String,required:true,minLength:8},
     phoneNumber:{type:Number,minLength:11},
@@ -27,7 +31,6 @@ const schema=new mongoose.Schema({
     isBanned:{
         type:Boolean,
         required:false,
-
     }
 })
 
