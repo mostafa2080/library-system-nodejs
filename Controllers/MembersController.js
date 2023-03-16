@@ -38,7 +38,11 @@ exports.MemberLogin=(request,response,next)=>{
 exports.getAllMembers=(request,response,next)=>{
     Members.find({})
     .then((data)=>{
-        response.status(200).json({data});
+        if(data){
+            response.status(200).json({data});
+        }else{
+            next(new Error("No Members Exist, yet...!"));
+        }
     })
     .catch((error)=>{
         next(error);
@@ -49,10 +53,14 @@ exports.getAllMembers=(request,response,next)=>{
 exports.getMember=(request,response,next)=>{
     Members.findOne({_id:request.params._id})
     .then((data)=>{
-        response.status(200).json({data});
+        if(data){
+            response.status(200).json({data});
+        }else{
+            next(new Error("No Such Member Exists...!"));
+        }
     })
     .catch((error)=>{
-        next(new Error("No Such Member Exists...!"));
+        next(new Error("Error Exists...!"));
     })
 };
 /**************** Get a Member **************/
@@ -97,7 +105,7 @@ exports.updateMember=(request,response,next)=>{
     if(request.decodedToken.role == "Member" && request.decodedToken.id == request.body._id){
         let hashedPass=request.body.password?bcrypt.hashSync(request.body.password,salt):request.body.password;
         Members.findOneAndUpdate(
-            {_id:request.body.id},
+            {_id:request.body._id},
             {
                 $set:{
                     fullName:request.body.fullName,
@@ -161,40 +169,45 @@ exports.updateMember=(request,response,next)=>{
 }
 /**************** Update Exist Member **************/
 
-exports.deleteMember=(request,response,next)=>{
-    Members.findOneAndDelete({_id:request.params._id})
-    .then((data)=>{
-        if(data == null){
-            next(new Error("No Such Member Exists...!"));
-        }else{
-            if(data["image"] != null){
-                let path=data.image;
-                console.log(path);
-                fileSystem.unlink(path,(error)=>{
-                    next(error);
-                });
+exports.deleteMember=async(request,response,next)=>{
+    try{
+        await Members.findOneAndDelete({_id:request.params._id})
+        .then((data)=>{
+            if(data == null){
+                next(new Error("No Such Member Exists...!"));
+            }else{
+                if(data["image"] != null){
+                    let path=data.image;
+                    console.log(path);
+                    fileSystem.unlink(path,(error)=>{
+                        next(error);
+                    });
+                }
             }
-        }
-    })
-    .then(async(data)=>{
-        MembersReport.updateOne({},{
-            $inc:{
-                deletedMembers:1,
-                // numberOfMembers: -1
-            },
-            $set:{
-                year:new Date().getFullYear(),
-                month:month[d],
-                numberOfMembers: await Members.countDocuments()
-            }
-        },{upsert:true})
-        .then(()=>{
-            response.status(200).json({data:"Deleted Successfully."});
         })
-        .catch((error)=>{
-            next(error);
+        .then(async(data)=>{
+            MembersReport.updateOne({},{
+                $inc:{
+                    deletedMembers:1,
+                    newMembers:-1
+                    // numberOfMembers: -1
+                },
+                $set:{
+                    year:new Date().getFullYear(),
+                    month:month[d],
+                    numberOfMembers: await Members.countDocuments()
+                }
+            },{upsert:true})
+            .then(()=>{
+                response.status(200).json({data:"Deleted Successfully."});
+            })
+            .catch((error)=>{
+                next(error);
+            })
         })
-    })
+    }catch(error){
+        next(error);
+    }
 }
 /**************** Delete Member **************/
 
