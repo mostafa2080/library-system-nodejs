@@ -16,10 +16,11 @@ const EmployeeRoute = require("./Routes/EmployeeRoute");
 const BooksRoute = require("./Routes/BooksRoute");
 const BorrowsRoute = require("./Routes/BorrowsRoute");
 const MembersRoute = require("./Routes/MembersRoute");
-const BooksReports = require("./Routes/BooksReportRoute");
+const ReadingBookRoute = require("./Routes/ReadingBooksRoute");
 
 //Report Routes
 const AdministratorReportRoute = require("./Routes/AdminstratorReportRoute");
+const BooksReports = require("./Routes/BooksReportRoute");
 
 //Port Connection
 const port = config.port || 8080; //Used in Listening
@@ -29,22 +30,22 @@ const app = express();
 mongoose.set("strictQuery", true);
 // Db Connection
 mongoose
-    .connect(config.db.uri)
-    // .connect(
-    //     `${config.db.driver}://${config.db.hostName}:${config.db.portNumber}/${config.db.dbName}`
-    // )
-    .then(() => {
-        console.log(`DB connected - ${config.db.name}`);
-        // Listening
-        app.listen(port, () => {
-            console.log(`Listening on port ${port}`);
-        });
-        // Ban and unban members
-        banAndUnbanMembers();
-    })
-    .catch((error) => {
-        console.log("Db Problem " + error);
+  .connect(config.db.uri)
+  // .connect(
+  //     `${config.db.driver}://${config.db.hostName}:${config.db.portNumber}/${config.db.dbName}`
+  // )
+  .then(() => {
+    console.log(`DB connected - ${config.db.name}`);
+    // Listening
+    app.listen(port, () => {
+      console.log(`Listening on port ${port}`);
     });
+    // Ban and unban members
+    banAndUnbanMembers();
+  })
+  .catch((error) => {
+    console.log("Db Problem " + error);
+  });
 
 // CORS
 app.use(cors());
@@ -75,13 +76,13 @@ app.use(AdministratorReportRoute);
 
 // Not Found MW
 app.use((request, response) => {
-    console.log("Not Found");
-    response.status(404).json({
-        message: "Page Not Found",
-    });
+  console.log("Not Found");
+  response.status(404).json({
+    message: "Page Not Found",
+  });
 });
 
 // Error MW
 app.use((error, request, response, next) => {
-    response.status(500).json({ message: error + "" });
+  response.status(500).json({ message: error + "" });
 });

@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 const schema = new mongoose.Schema({
   date: {
-    type: date,
+    type: Date,
     required: [true, "Date Of Reading Is Required"],
   },
   book: {
@@ -20,5 +20,9 @@ const schema = new mongoose.Schema({
       ref: "employees",
     },
   ],
+  copiesInReading: {
+    type: Number,
+    required: [true, "Number Of Books In Reading"],
+  },
 });
 mongoose.model("readingBooks", schema);
