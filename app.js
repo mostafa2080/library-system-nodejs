@@ -16,6 +16,7 @@ const EmployeeRoute = require("./Routes/EmployeeRoute");
 const BooksRoute = require("./Routes/BooksRoute");
 const BorrowsRoute = require("./Routes/BorrowsRoute");
 const MembersRoute = require("./Routes/MembersRoute");
+const BooksReports = require("./Routes/BooksReportRoute");
 
 //Report Routes
 const AdministratorReportRoute = require("./Routes/AdminstratorReportRoute");
@@ -67,6 +68,7 @@ app.use(BorrowsRoute);
 app.use(MembersRoute);
 app.use(EmployeeRoute);
 app.use(AdministratorRoute);
+app.use(BooksReports);
 
 //Using Report Routes
 app.use(AdministratorReportRoute);
