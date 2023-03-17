@@ -8,6 +8,7 @@ exports.addValidator = [
     body('birthDate').isDate().withMessage('Birth date is not valid'),
     body('hireDate').isDate().withMessage('Hire date is not valid'),
     body('salary').isNumeric().withMessage('Salary is not valid'),
+    body("image").optional()
 ];
 
 exports.editValidator = [
