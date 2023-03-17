@@ -14,7 +14,7 @@ exports.getAllBooks = async (req, res, next) => {
 exports.getBook = async (req, res, next) => {
     try {
         const book = await Books.findById(req.params._id);
-        if (!book) next(new Error("Book not found 💩"));
+        if (!book) throw Error("Book not found 💩");
         else {
             res.status(200).json({ book });
         }
@@ -71,18 +71,9 @@ exports.updateBook = async (req, res, next) => {
 };
 
 exports.deleteBook = async (req, res, next) => {
-    if (
-        !(
-            req.decodedToken.role == "Admin" ||
-            req.decodedToken.role == "BasicAdmin"
-        )
-    ) {
-        res.status(401).json({ message: "Unauthorized" });
-        return;
-    }
     try {
         const book = await Books.deleteOne({ _id: req.params._id });
-        if (book.deletedCount == 0) next(new Error("Book not found 💩"));
+        if (book.deletedCount == 0) throw Error("Book not found 💩");
         else {
             res.status(200).json({ book });
         }
