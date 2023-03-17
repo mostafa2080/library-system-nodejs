@@ -45,12 +45,6 @@ exports.addBorrow = async (req, res, next) => {
             deadlineDate: req.body.deadlineDate || twoDaysDeadlineDate,
         }).save();
 
-        await Books.updateOne(
-            { _id: req.body.bookID },
-            {
-                $set: {},
-            }
-        );
         res.status(201).json({ result });
     } catch (err) {
         next(err);
