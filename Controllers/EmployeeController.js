@@ -198,7 +198,7 @@ exports.loginEmployee = (req, res, next) => {
                     email: data.email,
                     role: "Employee"
                 },"OSTrack", { expiresIn: "1h" });
-
+                // TODO check if first login
                 res.status(200).json({ msg: "Login Success", token: token });
             }
             else {
