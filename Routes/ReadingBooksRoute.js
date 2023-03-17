@@ -1,12 +1,12 @@
-const express = require("express");
+const express = require('express');
 const router = express.Router();
-const readingBooksController = require("./../Controllers/ReadingBooksController");
-const auth = require("./../Core/AuthenticationMw/Authorization");
-const { titleArray } = require("./../Core/ValidationMW/ReadingValidation");
-const validator = require("./../Core/ValidationMW/validateMW");
+const readingBooksController = require('./../Controllers/ReadingBooksController');
+const auth = require('./../Core/AuthenticationMw/Authorization');
+const { titleArray } = require('./../Core/ValidationMW/ReadingValidation');
+const validator = require('./../Core/ValidationMW/validateMW');
 
 router
-  .route("/reading/:title")
+  .route('/reading/:title')
   .get(
     auth.memberOrAbove,
     titleArray,
@@ -24,6 +24,15 @@ router
     titleArray,
     validator,
     readingBooksController.returningReadBooks
+  );
+
+router
+  .route('/reading')
+  .get(
+    auth.memberOrAbove,
+    titleArray,
+    validator,
+    readingBooksController.getAllReadingBooks
   );
 
 module.exports = router;
