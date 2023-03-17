@@ -24,7 +24,9 @@ exports.getBorrow = async (req, res, next) => {
         next(err);
     }
 };
-
+// TODO get member's borrowed books
+// TODO number of borrowed book (same member and book)
+// TODO created_at field to show recently arrived books
 exports.addBorrow = async (req, res, next) => {
     const continueWithBorrow = await canBorrow(req, res, next);
     if (!continueWithBorrow) {
@@ -107,6 +109,7 @@ const canBorrow = async (req, res, next) => {
         res,
         next
     );
+    // TODO change availability if book can't be borrowed anymore
     if (
         unreturnedBorrows === 0 &&
         book.copiesCount - copiesCount > 1 &&
@@ -190,5 +193,7 @@ exports.bansCheckCycle = async () => {
     } catch (err) {
         console.log(err);
     }
-    console.log("Ban/unban cycle complete.");
+
+    const d = new Date();
+    console.log("Ban/unban cycle complete at:", d.toLocaleString());
 };
