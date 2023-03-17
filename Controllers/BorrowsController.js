@@ -193,5 +193,7 @@ exports.bansCheckCycle = async () => {
     } catch (err) {
         console.log(err);
     }
-    console.log("Ban/unban cycle complete.");
+
+    const d = new Date();
+    console.log("Ban/unban cycle complete at:", d.toLocaleString());
 };
