@@ -11,13 +11,13 @@ router
 
 router
   .route("/reading/:_id")
-  .patch(
+  .post(
     auth.employeeOrAbove,
     titleArray,
     validator,
     readingBooksController.addReadingBook
   )
-  .delete(
+  .patch(
     auth.employeeOrAbove,
     titleArray,
     validator,
