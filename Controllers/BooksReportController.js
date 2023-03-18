@@ -145,7 +145,7 @@ exports.readBooks = (req, res, next) => {
 
 //Find the books read by a specific member today
 exports.readBooksByMember = async (req, res, next) => {
-  const data = await Read.find({ members: req.params.memberID });
+  const data = await Read.find({ member: req.params.memberID });
     const populatedData = await Books.populate(data, {
         path: "book",
         select: "title"
@@ -162,9 +162,6 @@ exports.readBooksByMember = async (req, res, next) => {
 // Find the most read books for today
 exports.mostReadBooks = async (req, res, next) => {
     const data = await Read.aggregate([
-        {
-            $unwind: "$members"
-        },
         {
             $group: {
                 _id: "$book",
