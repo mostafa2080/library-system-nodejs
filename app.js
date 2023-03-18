@@ -70,6 +70,7 @@ app.use(MembersRoute);
 app.use(EmployeeRoute);
 app.use(AdministratorRoute);
 app.use(BooksReports);
+app.use(ReadingBookRoute);
 
 //Using Report Routes
 app.use(AdministratorReportRoute);
