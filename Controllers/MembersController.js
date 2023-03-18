@@ -68,7 +68,6 @@ exports.getMember=(request,response,next)=>{
 exports.addMember=async(request,response,next)=>{
     try{
         let data=await new Members({
-            _id:request.body._id,
             fullName:request.body.fullName,
             email:request.body.email,
             password:bcrypt.hashSync(request.body.password,salt),
@@ -125,8 +124,8 @@ exports.updateMember=(request,response,next)=>{
                     fileSystem.unlink(data["image"],(error)=>{
                         next(new Error("Can't Remove Old Image...!"));
                     });
-                    response.status(200).json({data:"update member data"});
                 }
+                response.status(200).json({data,mssg:"update member data"});
             }
         })
         .catch((error)=>{
@@ -156,8 +155,8 @@ exports.updateMember=(request,response,next)=>{
                     fileSystem.unlink(data["image"],(error)=>{
                         next(new Error("Can't Remove Old Image...!"));
                     });
-                    response.status(200).json({data:"Updated Successfully."});
                 }
+                response.status(200).json({data, mssg:"Updated Successfully."});
             }
         })
         .catch((error)=>{
@@ -248,7 +247,7 @@ exports.membersByMonth = async(request , response , next)=>{
             month:request.params.month
         });
         if(result.length == 0){
-            response.status(404).json({message : "No Such Member Exists...!"});
+            response.status(404).json({message : "No New Member this month...!"});
         }else{
             response.status(200).json({result});
         }

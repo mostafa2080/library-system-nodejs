@@ -13,7 +13,7 @@ exports.getReadingBookReport = (req, res, next) => {
     $or: [
       { $and: [{ year: req.body.year }, { month: req.body.month }] },
       { year: req.body.year },
-      { month: req.body.month },
+      { month: req.body.month },{}
     ],
   })
     .populate("readBooks")
@@ -42,7 +42,7 @@ exports.addReadingBook = async (req, res, next) => {
           //Pushing The Reading Request Into the Report Database
           let date = new Date();
           ReadingBookReportSchema.findOneAndUpdate(
-            { year: date.getFullYear(), month: date.getMonth() },
+            { year: date.getFullYear(), month: date.getMonth() + 1 },
             {
               $push: { readBooks: data["_id"] },
             },
