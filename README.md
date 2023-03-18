@@ -70,4 +70,4 @@ This project was developed as part of the ITI Node.js course.
 
 # Here is an Image for Planning & Steps :
 
-![](<./Images/ReadMeImage/nodejs%20project%20(1).jpg>)
+![](<./Images/ReadMeImage/ReadMe.jpg(1).jpg>)
