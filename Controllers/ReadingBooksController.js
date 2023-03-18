@@ -6,6 +6,7 @@ const ReadingBookSchema = mongoose.model("readingBooks");
 const ReadingBookReportSchema = mongoose.model("readingBooksReport");
 const BooksSchema = mongoose.model("books");
 const MemberSchema = mongoose.model("members");
+const { totalAvailableCopies } = require("./../Controllers/BorrowsController");
 
 exports.getReadingBookReport = (req, res, next) => {
   ReadingBookReportSchema.find({
@@ -47,6 +48,8 @@ exports.addReadingBook = async (req, res, next) => {
             },
             { upsert: true, new: true }
           ).then(() => {
+            if (totalAvailableCopies(req.params["_id"]) <= 0)
+              wantedBook["isAvailable"] = false;
             res.status(201).json({
               Message: "Getting Book For Reading Successfull ",
               data,
@@ -76,6 +79,8 @@ exports.returningReadBooks = async (req, res, next) => {
           $set: { returned: true },
         }
       ).then((data) => {
+        if (totalAvailableCopies(req.params["_id"]) >= 0)
+          returnedBook["isAvailable"] = true;
         if (data.modifiedCount !== 0)
           res.status(200).json({ Message: "Book Returned From Reading", data });
         else throw new Error("There is no record for returining this book");
