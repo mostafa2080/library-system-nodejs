@@ -10,6 +10,10 @@ const administratorSchema = new mongoose.Schema({
     type: String,
     required: [false, "Please Enter Administrator Last Name "],
   },
+  role: {
+    type: String,
+    required: [false, "Please Enter Role Of Admin"],
+  },
   email: {
     type: String,
     match: [

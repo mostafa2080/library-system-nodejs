@@ -1,10 +1,10 @@
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 // require("./../Model/BooksModel");
-require('./../Model/ReadingBooksModel');
-require('./../Model/ReadingBooksReportModel');
-const ReadingBookSchema = mongoose.model('readingBooks');
-const ReadingBookReportSchema = mongoose.model('readingBooksReport');
-const BooksSchema = mongoose.model('books');
+require("./../Model/ReadingBooksModel");
+require("./../Model/ReadingBooksReportModel");
+const ReadingBookSchema = mongoose.model("readingBooks");
+const ReadingBookReportSchema = mongoose.model("readingBooksReport");
+const BooksSchema = mongoose.model("books");
 
 exports.gettingReadingBooks = (req, res, next) => {
   ReadingBookReportSchema.find({
@@ -23,16 +23,16 @@ exports.giveBookForReading = async (req, res, next) => {
     { title: req.params.title },
     { isAvailable: 1 }
   );
-  if (wantedBook['isAvailable'] === true) {
+  if (wantedBook["isAvailable"] === true) {
     let date = new Date();
-    if (req.decodedToken['role'] === 'Member') {
+    if (req.decodedToken["role"] === "Member") {
       ReadingBookSchema.updateOne(
         { title: req.params.title },
         {
           $set: {
             date,
-            book: wantedBook['_id'],
-            members: req.decodedToken['_id'],
+            book: wantedBook["_id"],
+            members: req.decodedToken["_id"],
           },
           $inc: { copiesInReading: 1 },
         },
@@ -44,27 +44,27 @@ exports.giveBookForReading = async (req, res, next) => {
           ReadingBookReportSchema.findOneAndUpdate(
             { year: date.getFullYear, month: date.getMonth },
             {
-              readBooks: wantedBook['_id'],
+              readBooks: wantedBook["_id"],
             },
             { upsert: true, new: true }
           )
             .then(() => {
               res.status(201).json({
-                Message: 'Getting Book For Reading Successfull ',
+                Message: "Getting Book For Reading Successfull ",
                 data,
               });
             })
             .catch((error) => next(error));
         })
         .catch((error) => next(error));
-    } else if (req.decodedToken['role'] === 'Employee') {
+    } else if (req.decodedToken["role"] === "Employee") {
       ReadingBookSchema.updateOne(
         { title: req.params.title },
         {
           $set: {
             date,
-            book: wantedBook['_id'],
-            employees: req.decodedToken['_id'],
+            book: wantedBook["_id"],
+            employees: req.decodedToken["_id"],
           },
           $inc: { copiesInReading: 1 },
         },
@@ -76,13 +76,13 @@ exports.giveBookForReading = async (req, res, next) => {
           ReadingBookReportSchema.findOneAndUpdate(
             { year: date.getFullYear, month: date.getMonth },
             {
-              readBooks: wantedBook['_id'],
+              readBooks: wantedBook["_id"],
             },
             { upsert: true, new: true }
           )
             .then(() => {
               res.status(201).json({
-                Message: 'Getting Book For Reading Successfull ',
+                Message: "Getting Book For Reading Successfull ",
                 data,
               });
             })
@@ -101,7 +101,7 @@ exports.returningReadBooks = (req, res, next) => {
     }
   )
     .then((data) =>
-      res.status(200).json({ Message: 'Book Returned From Reading', data })
+      res.status(200).json({ Message: "Book Returned From Reading", data })
     )
     .catch((error) => next(error));
 };
@@ -109,13 +109,16 @@ exports.returningReadBooks = (req, res, next) => {
 exports.checkingUnReturnedReadBooks = () => {
   ReadingBookSchema.find({ copiesInReading: { $gt: 0 } }, { book: 1 }).then(
     (data) => {
-      if (data !== null) console.log('Unreturned Books Are' + unReturnedBooks);
+      if (data !== null) console.log("Unreturned Books Are" + unReturnedBooks);
       else console.log("All Reading Books 've been Returned");
     }
   );
 };
 //getall reading book report
-async function getAllReadingBooks(req, res) {
+module.exports.getAllReadingBooks = async function getAllReadingBooks(
+  req,
+  res
+) {
   try {
     const reports = await ReadingBookReportSchema.find();
     return res.status(200).json({ success: true, data: reports });
@@ -123,9 +126,7 @@ async function getAllReadingBooks(req, res) {
     console.log(error);
     return res.status(500).json({
       success: false,
-      error: 'Reading Report Data Can not be Returned',
+      error: "Reading Report Data Can not be Returned",
     });
   }
-}
-
-module.exports = { getAllReadingBooks };
+};
