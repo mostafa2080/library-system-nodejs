@@ -2,6 +2,7 @@ const mongoose = require('mongoose');
 
 const Books = mongoose.model('books');
 const Borrow = mongoose.model('borrows');
+const Read = mongoose.model('readingBooks');
 
 // number of books that are currently borrowed by users and not yet returned
 exports.borrowedBooks = (req, res, next) => {
@@ -133,7 +134,7 @@ exports.newArrivedBooks = (req, res, next) => {
 //Count the number of books that have been marked as read today
 exports.readBooks = (req, res, next) => {
   let today = new Date();
-  Read.find({ readDate: today }).countDocuments((err, count) => {
+  Read.find({ date: today }).countDocuments((err, count) => {
     if (err) {
       next(err);
     } else {
@@ -143,45 +144,49 @@ exports.readBooks = (req, res, next) => {
 };
 
 //Find the books read by a specific member today
-exports.readBooksByMember = (req, res, next) => {
-  let today = new Date();
-  Read.find({ memberID: req.params.memberID, readDate: today })
-    .then((reads) => {
-      res.status(200).json(reads);
+exports.readBooksByMember = async (req, res, next) => {
+  const data = await Read.find({ members: req.params.memberID });
+    const populatedData = await Books.populate(data, {
+        path: "book",
+        select: "title"
     })
-    .catch((err) => {
-      next(err);
-    });
+        .then((data) => {
+            res.status(200).json(data);
+        })
+        .catch((err) => {
+            next(err);
+        });
+  
 };
 
 // Find the most read books for today
 exports.mostReadBooks = async (req, res, next) => {
-  let today = new Date();
-  const data = await Read.aggregate([
-    {
-      $match: { readDate: today },
-    },
-    {
-      $group: {
-        _id: '$bookID',
-        count: { $sum: 1 },
-      },
-    },
-    {
-      $sort: { count: -1 },
-    },
-    {
-      $limit: 5,
-    },
-  ]);
-  const populatedData = await Books.populate(data, {
-    path: '_id',
-    select: 'title',
-  })
-    .then((reads) => {
-      res.status(200).json(reads);
+    const data = await Read.aggregate([
+        {
+            $unwind: "$members"
+        },
+        {
+            $group: {
+                _id: "$book",
+                count: { $sum: 1 }
+            }
+        },
+        {
+            $sort: { count: -1 }
+        },
+        {
+            $limit: 5
+        }
+    ]);
+    const populatedData = await Books.populate(data, {
+        path: "_id",
+        select: "title"
     })
-    .catch((err) => {
-      next(err);
-    });
+        .then((data) => {
+            res.status(200).json(data);
+        })
+        .catch((err) => {
+            next(err);
+        });
+    
 };
