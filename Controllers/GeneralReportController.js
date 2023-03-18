@@ -14,13 +14,13 @@ getAllReports = async (req, res) => {
     const BorrowedBooksReport =
       await BooksReportController.borrowedBooksDetails();
 
-    // ... add more report calls as needed
+    //add more report calls as needed
 
     const allReports = {
       readingBooks,
       administratorsReport,
       BorrowedBooksReport,
-      // ... add more report data as needed
+      //add more report data as needed
     };
 
     return res.status(200).json({ success: true, data: allReports });

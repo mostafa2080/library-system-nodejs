@@ -3,165 +3,185 @@ const mongoose = require('mongoose');
 const Books = mongoose.model('books');
 const Borrow = mongoose.model('borrows');
 
-
-exports.borrowedBooks =  (req, res,next) => {
-    Borrow.find({returnDate: null}).countDocuments((err, count) => {
-        if (err) {
-           next(err);
-        } else {
-            res.status(200).json({count: count});
-        }
+// number of books that are currently borrowed by users and not yet returned
+exports.borrowedBooks = (req, res, next) => {
+  Borrow.find({ returnDate: null }).countDocuments((err, count) => {
+    if (err) {
+      next(err);
+    } else {
+      res.status(200).json({ count: count });
+    }
+  });
+};
+//Details of all books that have been borrowed but not yet returned
+exports.borrowedBooksDetails = (req, res, next) => {
+  Borrow.find({ returnDate: null })
+    .then((borrows) => {
+      res.status(200).json(borrows);
+    })
+    .catch((err) => {
+      next(err);
     });
 };
-
-exports.borrowedBooksDetails =  (req, res,next) => {
-    Borrow.find({returnDate: null})
-        .then((borrows) => {
-            res.status(200).json(borrows);
-        })
-        .catch((err) => {
-            next(err);
-    });
-};
-
+//Retrieve all the currently borrowed books by a specific member
 exports.borrowedBooksByMember = (req, res, next) => {
-    Borrow.find({memberID: req.params.memberID, returnDate: null})
-        .then((borrows) => {
-            res.status(200).json(borrows);
-        })
-        .catch((err) => {
-            next(err);
-        });
+  Borrow.find({ memberID: req.params.memberID, returnDate: null })
+    .then((borrows) => {
+      res.status(200).json(borrows);
+    })
+    .catch((err) => {
+      next(err);
+    });
 };
 
+//Get the number of borrowed books by a member with a given member ID
 exports.numberBorrowedBooksByMember = (req, res, next) => {
-    Borrow.find({memberID: req.params.memberID, returnDate: null})
-        .countDocuments((err, count) => {
-            if (err) {
-                next(err);
-            } else {
-                res.status(200).json({count: count});
-            }
-        });
+  Borrow.find({
+    memberID: req.params.memberID,
+    returnDate: null,
+  }).countDocuments((err, count) => {
+    if (err) {
+      next(err);
+    } else {
+      res.status(200).json({ count: count });
+    }
+  });
 };
 
+//Group the books by their IDs, count the number of times each book has been borrowed, sort the results in descending order based on the count, and finally return the top 5 most borrowed books.
 exports.mostBorrowedBooks = async (req, res, next) => {
-    const data = await Borrow.aggregate([
-        {
-            $match: {returnDate: {$ne: null}}
-        },
-        {
-            $group: {
-                _id: "$bookID",
-                count: {$sum: 1},
-            },
-        },
-        {
-            $sort: {count: -1},
-        },
-        {
-            $limit: 5,
-        },
-    ])
+  const data = await Borrow.aggregate([
+    {
+      $match: { returnDate: { $ne: null } },
+    },
+    {
+      $group: {
+        _id: '$bookID',
+        count: { $sum: 1 },
+      },
+    },
+    {
+      $sort: { count: -1 },
+    },
+    {
+      $limit: 5,
+    },
+  ]);
 
-    const populatedData = await Books.populate(data, {path: '_id', select: 'title'})
-        .then((borrows) => {
-            res.status(200).json(borrows);
-        })
-        .catch((err) => {
-            next(err);
-        });
-}
+  // Fetch Books data from database
+  const populatedData = await Books.populate(data, {
+    path: '_id',
+    select: 'title',
+  })
+    .then((borrows) => {
+      res.status(200).json(borrows);
+    })
+    .catch((err) => {
+      next(err);
+    });
+};
+//Fetch the top 5 most borrowed books by a member
+exports.mostBorrowedBooksByMember = async (req, res, next) => {
+  const data = await Borrow.aggregate([
+    {
+      $match: { memberID: req.params.memberID },
+    },
+    {
+      $group: {
+        _id: '$bookID',
+        count: { $sum: 1 },
+      },
+    },
+    {
+      $sort: { count: -1 },
+    },
+    {
+      $limit: 5,
+    },
+  ]);
 
-exports.mostBorrowedBooksByMember = async(req, res, next) => {
-    const data = await Borrow.aggregate([
-        {
-            $match: {memberID: req.params.memberID},
-        },
-        {
-            $group: {
-                _id: "$bookID",
-                count: {$sum: 1},
-            },
-        },
-        {
-            $sort: {count: -1},
-        },
-        {
-            $limit: 5,
-        },
-    ])
+  const populatedData = await Books.populate(data, {
+    path: '_id',
+    select: 'title',
+  })
+    .then((data) => {
+      res.status(200).json(data);
+    })
+    .catch((err) => {
+      next(err);
+    });
+};
 
-    const populatedData = await Books.populate(data, {path: '_id', select: 'title'})
-        .then((data) => {
-            res.status(200).json(data);
-        })
-        .catch((err) => {
-            next(err);
-        });
-}
-
+//Fetch the books that were added to the database in the last week.
 exports.newArrivedBooks = (req, res, next) => {
-    let today = new Date();
-    let lastWeek = new Date(today.getFullYear(), today.getMonth(), today.getDate() - 7);
-    Books.find({createdAt: {$gte: lastWeek}})
-        .then((borrows) => {
-            res.status(200).json(borrows);
-        })
-        .catch((err) => {
-            next(err);
-        });
-}
-
+  let today = new Date();
+  let lastWeek = new Date(
+    today.getFullYear(),
+    today.getMonth(),
+    today.getDate() - 7
+  );
+  Books.find({ createdAt: { $gte: lastWeek } })
+    .then((borrows) => {
+      res.status(200).json(borrows);
+    })
+    .catch((err) => {
+      next(err);
+    });
+};
 
 /*--------------------------------------------------------------------------------------*/
+//Count the number of books that have been marked as read today
+exports.readBooks = (req, res, next) => {
+  let today = new Date();
+  Read.find({ readDate: today }).countDocuments((err, count) => {
+    if (err) {
+      next(err);
+    } else {
+      res.status(200).json(count);
+    }
+  });
+};
 
-exports.readBooks =  (req, res,next) => {
-    let today = new Date();
-    Read.find({readDate: today}).countDocuments((err, count) => {
-        if (err) {
-           next(err);
-        } else {
-            res.status(200).json(count);
-        }
+//Find the books read by a specific member today
+exports.readBooksByMember = (req, res, next) => {
+  let today = new Date();
+  Read.find({ memberID: req.params.memberID, readDate: today })
+    .then((reads) => {
+      res.status(200).json(reads);
+    })
+    .catch((err) => {
+      next(err);
     });
 };
 
-exports.readBooksByMember = (req, res, next) => {
-    let today = new Date();
-    Read.find({memberID: req.params.memberID, readDate: today})
-        .then((reads) => {
-            res.status(200).json(reads);
-        })
-        .catch((err) => {
-            next(err);
-        }); 
-};
-
+// Find the most read books for today
 exports.mostReadBooks = async (req, res, next) => {
-    let today = new Date();
-    const data = await Read.aggregate([
-        {
-            $match: {readDate: today},
-        },
-        {
-            $group: {
-                _id: "$bookID",
-                count: {$sum: 1},
-            },
-        },
-        {
-            $sort: {count: -1},
-        },
-        {
-            $limit: 5,
-        },
-    ])
-    const populatedData = await Books.populate(data, {path: '_id', select: 'title'})
-        .then((reads) => {
-            res.status(200).json(reads);
-        })
-        .catch((err) => {
-            next(err);
-        });
-}
+  let today = new Date();
+  const data = await Read.aggregate([
+    {
+      $match: { readDate: today },
+    },
+    {
+      $group: {
+        _id: '$bookID',
+        count: { $sum: 1 },
+      },
+    },
+    {
+      $sort: { count: -1 },
+    },
+    {
+      $limit: 5,
+    },
+  ]);
+  const populatedData = await Books.populate(data, {
+    path: '_id',
+    select: 'title',
+  })
+    .then((reads) => {
+      res.status(200).json(reads);
+    })
+    .catch((err) => {
+      next(err);
+    });
+};
