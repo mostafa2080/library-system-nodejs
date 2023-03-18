@@ -28,32 +28,20 @@ router
     controller.updateMember
   );
 
-// <<<<<<< HEAD
 router.get("/members/report",Auth.employeeOrAbove,controller.getMembersReport);
 router.get("/members/search/:keyword",Auth.memberOrAbove,validate,controller.searchMembers);
+
+router.get("/members/month/:month",Auth.memberOrAbove,
+    param("month").isString().withMessage("Moth must be String in Format of {'March','April',...etc}...!")
+    ,validate,controller.membersByMonth);
+router.get("/members/year/:year",Auth.memberOrAbove,
+    param("year").isNumeric().withMessage("Year must be Number...!")
+    ,validate,controller.membersByYear);
+
 router.route("/members/:_id")
     .get(Auth.memberOrAbove,memberValidator.getOneMember,validate,controller.getMember)
     .delete(Auth.employeeOrAbove,memberValidator.memberDeleteValidator,validate,controller.deleteMember);
-// =======
-// router.get(
-//   "/members/report",
-//   Auth.employeeOrAbove,
-//   controller.getMembersReport
-// );
-// router
-//   .route("/members/:_id")
-//   .get(
-//     Auth.memberOrAbove,
-//     memberValidator.getOneMember,
-//     validate,
-//     controller.getMember
-//   )
-//   .delete(
-//     Auth.employeeOrAbove,
-//     memberValidator.memberDeleteValidator,
-//     validate,
-//     controller.deleteMember
-//   );
-// >>>>>>> dev
+
+
 
 module.exports = router;

@@ -258,7 +258,7 @@ exports.membersByMonth = async(request , response , next)=>{
 }
 /**************** Filter Members by Month **************/
 
-exports.membersByMonth = async(request , response , next)=>{
+exports.membersByYear = async(request , response , next)=>{
     try{
         const result=await MembersReport.find({
             year:request.params.year
