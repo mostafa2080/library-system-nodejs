@@ -1,7 +1,7 @@
-const mongoose = require('mongoose');
-require('../Model/BooksModel');
-require('../Model/BorrowsModel');
-require('../Model/membersModel');
+const mongoose = require("mongoose");
+require("../Model/BooksModel");
+require("../Model/BorrowsModel");
+require("../Model/MembersModel");
 
 const Books = mongoose.model('books');
 const Borrows = mongoose.model('borrows');
