@@ -1,10 +1,6 @@
-
 # Library System
 
 This is a library system built in Node.js, designed to manage books and their respective borrowers and readers. The system allows users to search, add, get, update, and delete books and users in a nosql database.
-
-
-
 
 ## Features
 
@@ -18,19 +14,30 @@ This is a library system built in Node.js, designed to manage books and their re
 - Read books in library
 - Check with a daily cron job if members returned books within deadlines otherwise ban them for 1 week
 
+## Getting Started
+
+- Prerequisites
+  To run this application, you need to have Node.js and NPM (Node Package Manager) installed on your computer. You can download them from the official Node.js website: https://nodejs.org/en/
+
 ## Installation
 
-1. Clone this repository
+1. Clone this repository https://github.com/mostafa2080/NodeJs-Project-
 2. Run npm install to install the required dependencies
+
 ```bash
   npm install
 ```
+
 3. Run npm start to start the server
+
 ### Local mongodb
+
 ```bash
   npm start
 ```
+
 ### Atlas mongodb
+
 ```bash
   NODE_ENV=production npm start
 ```
@@ -48,6 +55,11 @@ This is a library system built in Node.js, designed to manage books and their re
 - Filesystem
 - Middleware
 - Cron
+
+# Here is an Image for Planning & Steps :
+
+![](./images/ReadMeImage/ReadMe.jpg)
+
 ## Authors
 
 - [@mostafa2080](https://github.com/mostafa2080)
@@ -55,3 +67,7 @@ This is a library system built in Node.js, designed to manage books and their re
 - [@hassanOsama720](https://github.com/hassanOsama720)
 - [@Youssef-Abdullahx09](https://github.com/Youssef-Abdullahx09)
 - [@Muhammed-saber79](https://github.com/Muhammed-saber79)
+
+## Acknowledgments
+
+This project was developed as part of the ITI Node.js course.
