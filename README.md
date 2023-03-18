@@ -56,6 +56,8 @@ This is a library system built in Node.js, designed to manage books and their re
 - Middleware
 - Cron
 
+# Here is an Image for Planning & Steps :
+
 ![](./images/ReadMeImage/ReadMe.jpg)
 
 ## Authors
@@ -69,5 +71,3 @@ This is a library system built in Node.js, designed to manage books and their re
 ## Acknowledgments
 
 This project was developed as part of the ITI Node.js course.
-
-# Here is an Image for Planning & Steps :
