@@ -241,3 +241,35 @@ exports.searchMembers = async (request, response, next) => {
     }
 };
 /**************** Search For Member **************/
+
+exports.membersByMonth = async(request , response , next)=>{
+    try{
+        const result=await MembersReport.find({
+            month:request.params.month
+        });
+        if(result.length == 0){
+            response.status(404).json({message : "No Such Member Exists...!"});
+        }else{
+            response.status(200).json({result});
+        }
+    }catch(error){
+        next(error);
+    }
+}
+/**************** Filter Members by Month **************/
+
+exports.membersByYear = async(request , response , next)=>{
+    try{
+        const result=await MembersReport.find({
+            year:request.params.year
+        });
+        if(result.length == 0){
+            response.status(404).json({message : "No Such Member Exists...!"});
+        }else{
+            response.status(200).json({result});
+        }
+    }catch(error){
+        next(error);
+    }
+}
+/**************** Filter Members by Year **************/

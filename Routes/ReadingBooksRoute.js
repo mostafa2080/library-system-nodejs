@@ -10,7 +10,7 @@ router
   .get(auth.memberOrAbove, readingBooksController.getAllReadingBooks);
 
 router
-  .route("/reading/:title")
+  .route("/reading/:_id")
   .patch(
     auth.employeeOrAbove,
     titleArray,
