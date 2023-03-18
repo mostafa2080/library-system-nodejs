@@ -8,21 +8,17 @@ const schema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: "books",
   },
-  members: [
-    {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "members",
-    },
-  ],
-  employees: [
-    {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "employees",
-    },
-  ],
-  copiesInReading: {
-    type: Number,
-    required: [true, "Number Of Books In Reading"],
+  member: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "members",
+  },
+  employee: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "employees",
+  },
+  unReturned: {
+    type: Boolean,
+    required: [true, "Flag For unReturned Book"],
   },
 });
 mongoose.model("readingBooks", schema);

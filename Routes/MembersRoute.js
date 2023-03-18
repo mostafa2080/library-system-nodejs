@@ -28,24 +28,32 @@ router
     controller.updateMember
   );
 
-router.get(
-  "/members/report",
-  Auth.employeeOrAbove,
-  controller.getMembersReport
-);
-router
-  .route("/members/:_id")
-  .get(
-    Auth.memberOrAbove,
-    memberValidator.getOneMember,
-    validate,
-    controller.getMember
-  )
-  .delete(
-    Auth.employeeOrAbove,
-    memberValidator.memberDeleteValidator,
-    validate,
-    controller.deleteMember
-  );
+// <<<<<<< HEAD
+router.get("/members/report",Auth.employeeOrAbove,controller.getMembersReport);
+router.get("/members/search/:keyword",Auth.memberOrAbove,validate,controller.searchMembers);
+router.route("/members/:_id")
+    .get(Auth.memberOrAbove,memberValidator.getOneMember,validate,controller.getMember)
+    .delete(Auth.employeeOrAbove,memberValidator.memberDeleteValidator,validate,controller.deleteMember);
+// =======
+// router.get(
+//   "/members/report",
+//   Auth.employeeOrAbove,
+//   controller.getMembersReport
+// );
+// router
+//   .route("/members/:_id")
+//   .get(
+//     Auth.memberOrAbove,
+//     memberValidator.getOneMember,
+//     validate,
+//     controller.getMember
+//   )
+//   .delete(
+//     Auth.employeeOrAbove,
+//     memberValidator.memberDeleteValidator,
+//     validate,
+//     controller.deleteMember
+//   );
+// >>>>>>> dev
 
 module.exports = router;
