@@ -24,9 +24,9 @@ const schema=new mongoose.Schema({
         street:{type:String},
         building:{type:String}
     },
-    firstLogin:{
-        type:Boolean,
-        default:"true"
+    settings: {
+        type: String,
+        default: "default"
     },
     isBanned:{
         type:Boolean,

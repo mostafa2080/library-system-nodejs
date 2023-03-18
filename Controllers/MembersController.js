@@ -26,7 +26,7 @@ exports.MemberLogin=(request,response,next)=>{
                     "OSTrack",
                     {expiresIn:"2h"}
                 )
-                response.status(200).json({Message:"Authenticated",token});
+                response.status(200).json({Message:"Authenticated",token,settings:data.settings});
             }else{
                 next(new Error("Password is Invalid...!"));
             }
@@ -220,5 +220,24 @@ exports.getMembersReport=(request,response,next)=>{
         next(error);
     })
 }
-/**************** Login For Member **************/
+/**************** Get Members Report **************/
 
+
+exports.searchMembers = async (request, response, next) => {
+    try {
+        const result = await Members.find({
+            $or: [
+                { fullName: { $regex: request.params.keyword } },
+                { email: { $regex: request.params.keyword } },
+            ],
+        });
+        if (result.length === 0) {
+            response.status(404).json({ message: "No Such Member Exists...!" });
+        } else {
+            response.status(200).json({ result });
+        }
+    } catch (error) {
+        next(error);
+    }
+};
+/**************** Search For Member **************/

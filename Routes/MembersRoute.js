@@ -14,6 +14,7 @@ router.route("/members")
     .put(Auth.memberOrAbove,uploadImg("Member").single("image"),setImage,memberValidator.memberPutValidator,validate,controller.updateMember)
 
 router.get("/members/report",Auth.employeeOrAbove,controller.getMembersReport);
+router.get("/members/search/:keyword",Auth.memberOrAbove,validate,controller.searchMembers);
 router.route("/members/:_id")
     .get(Auth.memberOrAbove,memberValidator.getOneMember,validate,controller.getMember)
     .delete(Auth.employeeOrAbove,memberValidator.memberDeleteValidator,validate,controller.deleteMember);
