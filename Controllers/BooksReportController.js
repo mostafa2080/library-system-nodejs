@@ -132,15 +132,24 @@ exports.newArrivedBooks = (req, res, next) => {
 
 /*--------------------------------------------------------------------------------------*/
 //Count the number of books that have been marked as read today
-exports.readBooks = (req, res, next) => {
+exports.readBooks = async (req, res, next) => {
   let today = new Date();
-  Read.find({ date: today }).countDocuments((err, count) => {
-    if (err) {
+  let yesterday = new Date(
+    today.getFullYear(),
+    today.getMonth(),
+    today.getDate() - 1
+  );
+  const data = await Read.find({ date: {$gte : yesterday} });
+  const populatedData = await Books.populate(data, {
+    path: 'book',
+    select: 'title',
+  })
+    .then((data) => {
+      res.status(200).json(data);
+    })
+    .catch((err) => {
       next(err);
-    } else {
-      res.status(200).json(count);
-    }
-  });
+    });
 };
 
 //Find the books read by a specific member today
