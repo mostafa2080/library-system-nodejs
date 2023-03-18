@@ -24,9 +24,7 @@ exports.getBorrow = async (req, res, next) => {
         next(err);
     }
 };
-// TODO get member's borrowed books
-// TODO number of borrowed book (same member and book)
-// TODO created_at field to show recently arrived books
+
 exports.addBorrow = async (req, res, next) => {
     const continueWithBorrow = await canBorrow(req, res, next);
     if (!continueWithBorrow) {
@@ -36,6 +34,33 @@ exports.addBorrow = async (req, res, next) => {
         return;
     }
     try {
+        const book = await Books.findOne(
+            {
+                _id: result.bookID,
+            },
+            { copiesCount: 1, title: 1 }
+        );
+
+        const borrowedCopiesCount = await Borrows.find({
+            bookID: result.bookID,
+            returnDate: null,
+        }).count();
+
+        if (book.copiesCount - borrowedCopiesCount <= 1) {
+            await Books.updateOne(
+                { _id: result.bookID },
+                {
+                    $set: {
+                        isAvailable: false,
+                    },
+                }
+            );
+            res.status(200).json({
+                result,
+                message: `Book: ${book.title} is not available anymore.`,
+            });
+        }
+
         const date = new Date();
         const twoDaysDeadlineDate = date.setDate(date + 2);
         const result = await new Borrows({
@@ -67,7 +92,44 @@ exports.updateBorrow = async (req, res, next) => {
             },
             { new: true }
         );
-        res.status(200).json({ result });
+
+        const book = await Books.findOne(
+            {
+                _id: result.bookID,
+            },
+            { copiesCount: 1, title: 1 }
+        );
+
+        const borrowedCopiesCount = await Borrows.find({
+            bookID: result.bookID,
+            returnDate: null,
+        }).count();
+
+        if (book.copiesCount - borrowedCopiesCount > 1) {
+            await Books.updateOne(
+                { _id: result.bookID },
+                {
+                    $set: {
+                        isAvailable: true,
+                    },
+                }
+            );
+
+            res.status(200).json({
+                result,
+                message: `Book: ${book.title} is now available again.`,
+            });
+        } else {
+            await Books.updateOne(
+                { _id: result.bookID },
+                {
+                    $set: {
+                        isAvailable: false,
+                    },
+                }
+            );
+            res.status(200).json({ result });
+        }
     } catch (err) {
         next(err);
     }
@@ -75,11 +137,33 @@ exports.updateBorrow = async (req, res, next) => {
 
 exports.deleteBorrow = async (req, res, next) => {
     try {
-        const result = await Borrows.deleteOne({ _id: req.params._id });
-        if (result.deletedCount == 0) next(new Error("Borrow not found"));
-        else {
-            res.status(200).json({ result });
+        const result = await Borrows.findOneAndDelete({ _id: req.params._id });
+        if (!result) throw new Error("Borrow not found");
+
+        const book = await Books.findOne({
+            _id: result.bookID,
+            isAvailable: false,
+        });
+
+        if (book) {
+            await Books.updateOne(
+                {
+                    _id: result.bookID,
+                    isAvailable: false,
+                },
+                {
+                    $set: {
+                        isAvailable: true,
+                    },
+                }
+            );
+            res.status(200).json({
+                result,
+                message: `Book: ${book.title} is now available again.`,
+            });
         }
+
+        res.status(200).json({ result });
     } catch (err) {
         next(err);
     }
@@ -104,15 +188,15 @@ const canBorrow = async (req, res, next) => {
         res,
         next
     );
-    const copiesCount = await totalCurrentlyBorrowedCopiesOfBookCount(
-        req,
-        res,
-        next
-    );
-    // TODO change availability if book can't be borrowed anymore
+
+    const borrowedCopiesCount = await Borrows.find({
+        bookID: req.body.bookID,
+        returnDate: null,
+    }).count();
+
     if (
         unreturnedBorrows === 0 &&
-        book.copiesCount - copiesCount > 1 &&
+        book.copiesCount - borrowedCopiesCount > 1 &&
         !member.isBanned
     ) {
         return true;
@@ -126,13 +210,6 @@ const unreturnedBorrowsOfSameBookCount = async (req, res, next) =>
         memberID: req.body.memberID,
         returnDate: null,
     }).count();
-
-const totalCurrentlyBorrowedCopiesOfBookCount = async (req, res, next) => {
-    return await Borrows.find({
-        bookID: req.body.bookID,
-        returnDate: null,
-    });
-};
 
 exports.bansCheckCycle = async () => {
     const date = new Date().toISOString();
