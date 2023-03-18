@@ -7,7 +7,7 @@ const ReadingBookReportSchema = mongoose.model("readingBooksReport");
 const BooksSchema = mongoose.model("books");
 const MemberSchema = mongoose.model("members");
 
-exports.gettingReadingBooks = (req, res, next) => {
+exports.getReadingBookReport = (req, res, next) => {
   ReadingBookReportSchema.find({
     $or: [
       { $and: [{ year: req.body.year }, { month: req.body.month }] },
@@ -15,6 +15,7 @@ exports.gettingReadingBooks = (req, res, next) => {
       { month: req.body.month },
     ],
   })
+    .populate("readBooks")
     .then((data) => res.status(200).json({ data }))
     .catch((error) => next(error));
 };
@@ -24,20 +25,16 @@ exports.gettingReadingBooks = (req, res, next) => {
 // inserting all the data by referancing there _id
 exports.addReadingBook = async (req, res, next) => {
   try {
-    const wantedBook = await BooksSchema.findOne(
-      { title: req.params.title },
-      { isAvailable: 1 }
-    );
+    const wantedBook = await BooksSchema.findOne({ _id: req.params["_id"] });
     const member = await MemberSchema.findOne({ email: req.body.email });
-    console.log(member["_id"]);
-    if (wantedBook !== null && wantedBook["isAvailable"] === true) {
+    if (wantedBook && wantedBook["isAvailable"]) {
       let date = new Date();
       new ReadingBookSchema({
         date,
-        book: wantedBook["_id"],
+        book: req.params["_id"],
         member: member["_id"],
         employee: req.decodedToken["_id"],
-        unReturned: true,
+        returned: false,
       })
         .save()
         .then((data) => {
@@ -46,7 +43,7 @@ exports.addReadingBook = async (req, res, next) => {
           ReadingBookReportSchema.findOneAndUpdate(
             { year: date.getFullYear(), month: date.getMonth() },
             {
-              readBooks: wantedBook["_id"],
+              $push: { readBooks: data["_id"] },
             },
             { upsert: true, new: true }
           ).then(() => {
@@ -62,26 +59,28 @@ exports.addReadingBook = async (req, res, next) => {
   }
 };
 
-exports.returningReadBooks = (req, res, next) => {
+exports.returningReadBooks = async (req, res, next) => {
   try {
-    let returnedBook = BooksSchema.findOne(
-      { title: req.params.title },
+    let returnedBook = await BooksSchema.findOne(
+      { book: req.params._id },
       { _id: 1 }
     );
-    let returningMember = MemberSchema.findOne(
+    let returningMember = await MemberSchema.findOne(
       { email: req.body.email },
       { _id: 1 }
     );
-    if (returnedBook !== null && returningMember !== null) {
+    if (returnedBook && returningMember) {
       ReadingBookSchema.updateOne(
-        { book: returnedBook["_id"], employee: returningMember["_id"] },
+        { book: req.params["_id"], member: returningMember["_id"] },
         {
-          $set: { unReturned: true },
+          $set: { returned: true },
         }
-      ).then((data) =>
-        res.status(200).json({ Message: "Book Returned From Reading", data })
-      );
-    }
+      ).then((data) => {
+        if (data.modifiedCount !== 0)
+          res.status(200).json({ Message: "Book Returned From Reading", data });
+        else throw new Error("There is no record for returining this book");
+      });
+    } else throw new Error("There is no record for returining this book");
   } catch (error) {
     next(error);
   }
@@ -93,13 +92,15 @@ exports.checkingUnReturnedReadBooks = () => {
     else console.log("All Reading Books 've been Returned");
   });
 };
-//getall reading book report
+// getall reading book report
 module.exports.getAllReadingBooks = async function getAllReadingBooks(
   req,
   res
 ) {
   try {
-    const reports = await ReadingBookReportSchema.find();
+    const reports = await ReadingBookSchema.find()
+      .populate("employee")
+      .populate("member");
     return res.status(200).json({ success: true, data: reports });
   } catch (error) {
     console.log(error);

@@ -6,7 +6,7 @@ const readingBooksController = require('./ReadingBooksController');
 const AdministratorReportController = require('./AdministratorReportController');
 const BooksReportController = require('./BooksReportController');
 const employeeReportController = require('./EmployeeReportController');
-
+const memberReportController = require('./MembersController');
 // Define the general report route
 getAllReports = async (req, res) => {
   try {
@@ -17,7 +17,7 @@ getAllReports = async (req, res) => {
 
     const newBooks = await BooksReportController.newArrivedBooks();
     const employeeReport = await employeeReportController.getReports();
-
+    const memberReport = await memberReportController.getMembersReport();
     //add more report calls as needed
 
     const allReports = {
@@ -26,6 +26,7 @@ getAllReports = async (req, res) => {
       borrowedBooksReport,
       newBooks,
       employeeReport,
+      memberReport,
 
       //add more report data as needed
     };

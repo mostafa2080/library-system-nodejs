@@ -16,9 +16,9 @@ const schema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: "employees",
   },
-  unReturned: {
+  returned: {
     type: Boolean,
-    required: [true, "Flag For unReturned Book"],
+    required: [true, "Flag For Returned Book"],
   },
 });
 mongoose.model("readingBooks", schema);

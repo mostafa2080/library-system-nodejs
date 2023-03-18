@@ -1,4 +1,4 @@
 const { param } = require("express-validator");
 exports.titleArray = [
-  param("title").isString().withMessage("Enter a valid Title"),
+  param("_id").isMongoId().withMessage("Enter a valid _id Of Book"),
 ];
