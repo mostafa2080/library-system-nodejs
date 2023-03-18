@@ -17,7 +17,7 @@ router
     auth.employeeOrAbove,
     titleArray,
     validator,
-    readingBooksController.giveBookForReading
+    readingBooksController.addReadingBook
   )
   .delete(
     auth.employeeOrAbove,
