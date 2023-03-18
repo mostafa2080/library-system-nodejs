@@ -39,14 +39,14 @@ exports.addBorrow = async (req, res, next) => {
     }
     try {
         const date = new Date();
-        const twoDaysDeadlineDate = date.setDate(date + 2);
+        const twoDaysDeadlineDate = date.setDate(date.getDate() + 2);
         const result = await new Borrows({
             bookID: req.body.bookID,
             memberID: req.body.memberID,
             employeeID: req.body.employeeID,
             borrowDate: date.now,
             returnDate: null,
-            deadlineDate: req.body.deadlineDate || twoDaysDeadlineDate,
+            deadlineDate: req.body.deadlineDate || new Date(twoDaysDeadlineDate).toISOString(),
         }).save();
 
         const book = await Books.findOne(
