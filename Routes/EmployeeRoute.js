@@ -2,6 +2,7 @@ const express = require('express');
 const {uploadImg, setImage} = require('./../Utilities/ImageUtility');
 
 const Controller = require('./../Controllers/EmployeeController');
+const reportController = require('./../Controllers/EmployeeReportController');
 const validator = require('./../Core/ValidationMW/EmployeeValidation');
 const auth = require('./../Core/AuthenticationMw/Authorization');
 const Router = express.Router();
@@ -23,7 +24,7 @@ Router.route('/employee')
         
 
 Router.route('/employee/reports')
-    .get(auth.adminOrAbove, Controller.getReports)
+    .get(auth.adminOrAbove, reportController.getReports)
 
 
 
