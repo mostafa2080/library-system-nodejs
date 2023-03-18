@@ -19,6 +19,7 @@ getAllReports = async (req, res) => {
     const allReports = {
       readingBooks,
       administratorsReport,
+      BorrowedBooksReport,
       // ... add more report data as needed
     };
 
