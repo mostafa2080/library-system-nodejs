@@ -199,7 +199,9 @@ exports.loginEmployee = (req, res, next) => {
                     role: "Employee"
                 },"OSTrack", { expiresIn: "1h" });
 
-                res.status(200).json({ msg: "Login Success", token: token });
+                // TODO check if first login
+                
+                res.status(200).json({ msg: "Login Success", token: token, settings: data.settings });
             }
             else {
                 res.status(401).json({ Message: "Wrong Password" });
