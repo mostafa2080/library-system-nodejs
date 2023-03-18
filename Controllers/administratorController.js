@@ -159,3 +159,4 @@ exports.deleteAdministrator = (req, res, next) => {
     })
     .catch((error) => next(error));
 };
+/**The third argument is an options object specifying that the upsert flag should be set to true, meaning that if a document with the specified month and year does not exist, MongoDB should create a new one, and that the new flag should also be set to true, meaning that MongoDB should return the updated document */
