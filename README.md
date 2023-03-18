@@ -56,6 +56,10 @@ This is a library system built in Node.js, designed to manage books and their re
 - Middleware
 - Cron
 
+# Here is an Image for Planning & Steps :
+
+![](./images/ReadMeImage/ReadMe.jpg)
+
 ## Authors
 
 - [@mostafa2080](https://github.com/mostafa2080)
