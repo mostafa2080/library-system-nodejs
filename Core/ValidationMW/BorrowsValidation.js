@@ -11,13 +11,13 @@ exports.addValidator = [
         .isMongoId()
         .trim()
         .withMessage("Enter valid employee ID"),
-    body("borrowDate")
+    body("borrowDate").optional()
         .isDate()
         .trim()
         .default(Date.now)
         .withMessage("Borrow date is not valid"),
-    body("returnDate").isDate().trim().withMessage("Return date is not valid"),
-    body("deadlineDate")
+    body("returnDate").optional().isDate().trim().withMessage("Return date is not valid"),
+    body("deadlineDate").optional()
         .isDate()
         .trim()
         .withMessage("Deadline date is not valid"),
@@ -25,18 +25,18 @@ exports.addValidator = [
 
 exports.editValidator = [
     param("_id").isMongoId().withMessage("Enter a valid ID"),
-    body("bookID").isMongoId().trim().withMessage("Enter valid book ID"),
-    body("memberID").isMongoId().trim().withMessage("Enter valid member ID"),
-    body("employeeID")
+    body("bookID").optional().isMongoId().trim().withMessage("Enter valid book ID"),
+    body("memberID").optional().isMongoId().trim().withMessage("Enter valid member ID"),
+    body("employeeID").optional()
         .isMongoId()
         .trim()
         .withMessage("Enter valid employee ID"),
-    body("borrowDate")
+    body("borrowDate").optional()
         .isDate()
         .trim()
         .withMessage("Borrow date is not valid"),
     body("returnDate").isDate().trim().withMessage("Return date is not valid"),
-    body("deadlineDate")
+    body("deadlineDate").optional()
         .isDate()
         .trim()
         .withMessage("Deadline date is not valid"),

@@ -57,50 +57,50 @@ exports.addValidator = [
 
 exports.editValidator = [
     param("_id").isMongoId().withMessage("Enter a valid ID"),
-    body("title")
+    body("title").optional()
         .isString()
         .isLength({ min: 1, max: 100 })
         .trim()
         .withMessage("Book name must be between 1 and 100 characters"),
-    body("author")
+    body("author").optional()
         .isString()
         .isLength({ min: 1, max: 100 })
         .trim()
         .withMessage("Author name must be between 1 and 100 characters"),
-    body("publisher")
+    body("publisher").optional()
         .isString()
         .isLength({ min: 1, max: 100 })
         .trim()
         .withMessage("Publisher name must be between 1 and 100 characters"),
-    body("dateAdded")
+    body("dateAdded").optional()
         .isDate()
         .trim()
         .optional()
         .withMessage("Date added is not valid"),
-    body("datePublished")
+    body("datePublished").optional()
         .isDate()
         .trim()
         .withMessage("Date published is not valid"),
-    body("category")
+    body("category").optional()
         .isString()
         .trim()
         .isLength({ min: 1, max: 100 })
         .withMessage("Category name must be between 1 and 100 characters"),
-    body("pagesCount")
+    body("pagesCount").optional()
         .isNumeric()
         .trim()
         .isLength({ min: 1, max: 1800 })
         .withMessage("Pages count must be between 1 and 1800"),
-    body("copiesCount")
+    body("copiesCount").optional()
         .isNumeric()
         .trim()
         .isLength({ min: 1, max: 100 })
         .withMessage("Copies count must be between 1 and 1800"),
-    body("isAvailable")
+    body("isAvailable").optional()
         .isBoolean()
         .trim()
         .withMessage("Enter book's availability"),
-    body("shelfNo")
+    body("shelfNo").optional()
         .isNumeric()
         .trim()
         .isLength({ min: 1, max: 100 })
