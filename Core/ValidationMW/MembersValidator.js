@@ -1,8 +1,8 @@
 const {body,param,query}=require("express-validator");
 
 exports.memberPostValidator=[
-    body("_id").notEmpty().withMessage("ID Field Required...!")
-        .isMongoId().withMessage("ID must be a Object ID...!"),
+    /*body("_id").notEmpty().withMessage("ID Field Required...!")
+        .isMongoId().withMessage("ID must be a Object ID...!"),*/
     body("fullName").notEmpty().withMessage("FullName Field Required...!")
         .isString().withMessage("FullName must be string"),
     body("email").notEmpty().withMessage("Email Required...!")

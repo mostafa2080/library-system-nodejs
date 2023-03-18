@@ -3,7 +3,7 @@ var Schema = mongoose.Schema,
 ObjectId = Schema.ObjectId;
 
 const schema=new mongoose.Schema({
-    _id:ObjectId,
+    //_id:ObjectId,
     fullName:{type:String,required:true,minLength:8},
     email:{
         type:String,

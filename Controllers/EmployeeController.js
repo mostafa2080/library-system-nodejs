@@ -61,7 +61,7 @@ exports.addEmployee =  (req, res,next) => {
         email: req.body.email,
         password: bcrypt.hashSync(req.body.password, salt),
         birthDate: req.body.birthDate,
-        hireDate: req.body.hireDate,
+        hireDate: req.body.hireDate || new Date(),
         image: req.body.image,
         salary: req.body.salary,
         settings: "default",
