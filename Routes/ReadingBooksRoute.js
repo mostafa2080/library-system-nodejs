@@ -6,13 +6,11 @@ const { titleArray } = require("./../Core/ValidationMW/ReadingValidation");
 const validator = require("./../Core/ValidationMW/validateMW");
 
 router
+  .route("/reading")
+  .get(auth.memberOrAbove, readingBooksController.getAllReadingBooks);
+
+router
   .route("/reading/:title")
-  .get(
-    auth.memberOrAbove,
-    titleArray,
-    validator,
-    readingBooksController.gettingReadingBooks
-  )
   .patch(
     auth.employeeOrAbove,
     titleArray,
@@ -27,12 +25,7 @@ router
   );
 
 router
-  .route("/reading")
-  .get(
-    auth.memberOrAbove,
-    titleArray,
-    validator,
-    readingBooksController.getAllReadingBooks
-  );
+  .route("/report/readingBook")
+  .get(auth.memberOrAbove, readingBooksController.getReadingBookReport);
 
 module.exports = router;

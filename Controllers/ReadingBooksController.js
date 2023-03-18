@@ -7,7 +7,7 @@ const ReadingBookReportSchema = mongoose.model("readingBooksReport");
 const BooksSchema = mongoose.model("books");
 const MemberSchema = mongoose.model("members");
 
-exports.gettingReadingBooks = (req, res, next) => {
+exports.getReadingBookReport = (req, res, next) => {
   ReadingBookReportSchema.find({
     $or: [
       { $and: [{ year: req.body.year }, { month: req.body.month }] },
@@ -15,6 +15,10 @@ exports.gettingReadingBooks = (req, res, next) => {
       { month: req.body.month },
     ],
   })
+    // .populate({
+    //   path: "readBooks",
+    //   populate: { path: "employee", path: "member" },
+    // })
     .then((data) => res.status(200).json({ data }))
     .catch((error) => next(error));
 };
@@ -46,7 +50,7 @@ exports.addReadingBook = async (req, res, next) => {
           ReadingBookReportSchema.findOneAndUpdate(
             { year: date.getFullYear(), month: date.getMonth() },
             {
-              readBooks: wantedBook["_id"],
+              $push: { readBooks: wantedBook["_id"] },
             },
             { upsert: true, new: true }
           ).then(() => {
@@ -93,13 +97,15 @@ exports.checkingUnReturnedReadBooks = () => {
     else console.log("All Reading Books 've been Returned");
   });
 };
-//getall reading book report
+// getall reading book report
 module.exports.getAllReadingBooks = async function getAllReadingBooks(
   req,
   res
 ) {
   try {
-    const reports = await ReadingBookReportSchema.find();
+    const reports = await ReadingBookSchema.find()
+      .populate("employee")
+      .populate("member");
     return res.status(200).json({ success: true, data: reports });
   } catch (error) {
     console.log(error);
