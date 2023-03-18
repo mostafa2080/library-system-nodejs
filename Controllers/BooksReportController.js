@@ -121,7 +121,7 @@ exports.newArrivedBooks = (req, res, next) => {
     today.getMonth(),
     today.getDate() - 7
   );
-  Books.find({ createdAt: { $gte: lastWeek } })
+  Books.find({ dateAdded: { $gte: lastWeek } })
     .then((borrows) => {
       res.status(200).json(borrows);
     })

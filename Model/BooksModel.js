@@ -60,13 +60,6 @@ const booksSchema = new mongoose.Schema({
     min: [1, "Shelf number does not exist 😒"],
     max: [100, "Shelf number does not exist 😣"],
   },
-  availableCopies: {
-    type: Number,
-    required: [
-      true,
-      "Number Of Available Copies For Borrowing Or Reading Books",
-    ],
-  },
 });
 
 mongoose.model("books", booksSchema);
