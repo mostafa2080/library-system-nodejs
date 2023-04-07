@@ -88,5 +88,10 @@ app.use((request, response) => {
 
 // Error MW
 app.use((error, request, response, next) => {
-  response.status(500).json({ message: error + "" });
+    // reponse with status code and message
+    response.status(error.status || 500).json({
+        message: error.message
+    }
+    );
+
 });
