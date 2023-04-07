@@ -43,6 +43,7 @@ exports.getAdministrator = (req, res, next) => {
 
 // Add a Administrator
 exports.addAdministrator = (req, res, next) => {
+    console.log(req.body);
   let date = new Date();
   new AdministratorsSchema({
     email: req.body.email,

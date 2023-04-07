@@ -201,7 +201,7 @@ exports.loginEmployee = (req, res, next) => {
 
                 // TODO check if first login
                 
-                res.status(200).json({ msg: "Login Success", token: token, settings: data.settings });
+                res.status(200).json({ msg: "Login Success",data:data ,token: token, settings: data.settings });
             }
             else {
                 res.status(401).json({ Message: "Wrong Password" });

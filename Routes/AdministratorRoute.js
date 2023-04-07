@@ -15,6 +15,8 @@ router
   .get(basicAdmin, AdministratorController.getAllAdministrators)
   .post(
     basicAdmin,
+    uploadImg("Administrator").single("image"),
+    setImage,
     validateAdministrator.addValidationArray,
     validateMW,
     AdministratorController.addAdministrator
