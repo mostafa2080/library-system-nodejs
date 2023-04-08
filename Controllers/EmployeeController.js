@@ -2,6 +2,7 @@ const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const fs = require('fs');
+const {dirname} = require('path');
 
 const saltRounds = 10;
 const salt = bcrypt.genSaltSync(saltRounds);
@@ -96,8 +97,8 @@ exports.updateEmployee = (req, res, next) => {
 
     }
     
-    if(req.decodedToken.role == "Employee" && req.body._id == req.decodedToken._id){
-        Employees.updateOne({ _id: req.body._id }, {
+    if(req.decodedToken.role === "Employee" && req.body._id === req.decodedToken._id){
+        Employees.findOneAndUpdate({ _id: req.body._id }, {
             $set: {
                 firstName: req.body.firstName,
                 lastName: req.body.lastName,
@@ -108,8 +109,10 @@ exports.updateEmployee = (req, res, next) => {
             }
         })
         .then((data) => {
-            if(req.file != undefined){
-                let path = __dirname + "/../images/Employee/" + data.image;
+
+            if(req.file !== undefined){
+                let root = dirname(require.main.filename);
+                let path = root + "/images/Employee/" + data.image;
                 fs.unlink(path, (err) => {
                 if (err) {
                     console.log(err);
@@ -137,7 +140,8 @@ exports.updateEmployee = (req, res, next) => {
         })
         .then((data) => {
             if(req.file != undefined){
-                let path = __dirname + "/../images/Employee/" + data.image;
+                let root = dirname(require.main.filename);
+                let path = root + "/images/Employee/" + data.image;
                 fs.unlink(path, (err) => {
                 if (err) {
                     console.log(err);
@@ -160,7 +164,8 @@ exports.updateEmployee = (req, res, next) => {
 exports.deleteEmployee = (req, res, next) => {
     Employees.findOneAndDelete({ _id: req.params._id })
     .then(async(data) => {
-        let path = __dirname + "/../images/Employee/" + data.image;
+        let root = dirname(require.main.filename);
+        let path = root + "/images/Employee/" + data.image;
         fs.unlink(path, (err) => {
             if (err) {
                 console.log(err);

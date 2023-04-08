@@ -22,6 +22,7 @@ const GeneralReportRoute = require("./Routes/GeneralReportRoute");
 //Report Routes
 const AdministratorReportRoute = require("./Routes/AdminstratorReportRoute");
 const BooksReports = require("./Routes/BooksReportRoute");
+const {join} = require("path");
 
 //Port Connection
 const port = config.port || 8080; //Used in Listening
@@ -57,7 +58,7 @@ app.use(Loggings("dev"));
 // Parsing
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
-
+app.use('/images', express.static(join(__dirname, 'images')))
 //LoginMW
 app.use(LoginRoute);
 
