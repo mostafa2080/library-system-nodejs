@@ -23,6 +23,7 @@ module.exports = async (req, res, next) => {
               });
               res.status(200).json({
                 Message: "Authenticated",
+                data: data2,
                 token,
               });
             } else throw new Error("Email Or Password Are Wrong");
