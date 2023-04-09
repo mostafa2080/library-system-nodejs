@@ -25,14 +25,14 @@ exports.getAdministrator = (req, res, next) => {
     req.decodedToken.role === "Admin" &&
     req.params.email === req.decodedToken.email
   ) {
-    AdministratorsSchema.find({ email: req.params.email })
+    AdministratorsSchema.find({ _id: req.params.id })
       .then((data) => {
         if (data.length !== 0) res.status(200).json({ data });
         else throw new Error("Administrator Is Not Found");
       })
       .catch((error) => next(error));
   } else if (req.decodedToken.role === "BasicAdmin") {
-    AdministratorsSchema.find({ email: req.params.email })
+    AdministratorsSchema.find({ _id: req.params.id })
       .then((data) => {
         if (data.length !== 0) res.status(200).json({ data });
         else throw new Error("Administrator Is Not Found");
@@ -86,7 +86,7 @@ exports.updateAdministrator = async (req, res, next) => {
     req.body.email === req.decodedToken.email
   ) {
     AdministratorsSchema.findOneAndUpdate(
-      { email: req.body.email },
+      { _id: req.params.id },
       {
         $set: {
           firstName: req.body.firstName,
@@ -108,7 +108,7 @@ exports.updateAdministrator = async (req, res, next) => {
       .catch((err) => next(err));
   } else if (req.decodedToken.role === "BasicAdmin") {
     AdministratorsSchema.findOneAndUpdate(
-      { email: req.body.email },
+      { _id: req.params.id },
       {
         $set: {
           firstName: req.body.firstName,
@@ -137,7 +137,7 @@ exports.updateAdministrator = async (req, res, next) => {
 // Delete a Administrator
 exports.deleteAdministrator = (req, res, next) => {
   AdministratorsSchema.findOneAndDelete({
-    email: req.params.email,
+    _id: req.params.id,
   })
     .then((data) => {
       if (data === null) throw new Error("Administrator not found");

@@ -31,7 +31,7 @@ router
   );
 
 router
-  .route("/administrators/:email")
+  .route("/administrators/:id")
   .get(
     adminOrAbove,
     validateAdministrator.getValidationArray,

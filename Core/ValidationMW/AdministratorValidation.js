@@ -1,8 +1,6 @@
 const { body, param } = require("express-validator");
 exports.getValidationArray = [
-  param("email")
-    .isEmail()
-    .withMessage("Administrator Email must be a valid Email"),
+  param("id").isMongoId().withMessage("Administrator Id must be a valid Id"),
 ];
 exports.addValidationArray = [
   body("email")
@@ -52,7 +50,5 @@ exports.updateValidationArray = [
     .withMessage("Administrator Salary must be a Number"),
 ];
 exports.deleteValidationArray = [
-  param("email")
-    .isEmail()
-    .withMessage("Administrator Email must be a valid Email"),
+  param("id").isMongoId().withMessage("Administrator Id must be a valid Id"),
 ];
