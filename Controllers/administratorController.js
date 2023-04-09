@@ -43,12 +43,15 @@ exports.getAdministrator = (req, res, next) => {
 
 // Add a Administrator
 exports.addAdministrator = (req, res, next) => {
-    console.log(req.body);
+  console.log(req.body);
   let date = new Date();
   new AdministratorsSchema({
+    firstName: req.body.firstName,
+    lastName: req.body.lastName,
     email: req.body.email,
     password: bcrypt.hashSync(req.body.password, salt),
-    hireDate: date,
+    hireDate: req.body.hireDate,
+    birthDate: req.body.birthday,
     salary: req.body.salary,
     setting: "default",
   })

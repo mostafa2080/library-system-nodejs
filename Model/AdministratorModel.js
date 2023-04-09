@@ -41,6 +41,7 @@ const administratorSchema = new mongoose.Schema({
     type: Number,
     required: [true, "Please Enter Administrator Salary"],
   },
+  setting: String,
 });
 
 // Mapping Schema to Model
