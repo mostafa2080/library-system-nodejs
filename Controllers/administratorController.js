@@ -3,7 +3,6 @@ require("../Model/AdministratorModel");
 require("../Model/AdministratorReportModel");
 const fs = require("fs");
 const bcrypt = require("bcrypt");
-const { body } = require("express-validator");
 
 const saltRounds = 10;
 const salt = bcrypt.genSaltSync(saltRounds);
@@ -43,7 +42,6 @@ exports.getAdministrator = (req, res, next) => {
 
 // Add a Administrator
 exports.addAdministrator = (req, res, next) => {
-  console.log(req.body);
   let date = new Date();
   new AdministratorsSchema({
     firstName: req.body.firstName,
@@ -78,6 +76,7 @@ exports.addAdministrator = (req, res, next) => {
 
 //Update a Administrator
 exports.updateAdministrator = async (req, res, next) => {
+  console.log(req.params);
   let hashPass = req.body.password
     ? bcrypt.hashSync(req.body.password, salt)
     : req.body.password;
@@ -91,8 +90,7 @@ exports.updateAdministrator = async (req, res, next) => {
         $set: {
           firstName: req.body.firstName,
           lastName: req.body.lastName,
-          password: hashPass,
-          birthDate: req.body.birthDate,
+          birthDate: req.body.birthday,
           image: req.body.image,
         },
       }
@@ -100,7 +98,7 @@ exports.updateAdministrator = async (req, res, next) => {
       .then((data) => {
         if (data === null) next(new Error("Administrator not found"));
         else {
-          if (data["image"] != null)
+          if (data["image"] != undefined)
             fs.unlink(data["image"], (error) => next(error));
           res.status(200).json({ data });
         }
@@ -114,9 +112,8 @@ exports.updateAdministrator = async (req, res, next) => {
           firstName: req.body.firstName,
           lastName: req.body.lastName,
           email: req.body.email,
-          password: hashPass,
           birthDate: req.body.birthDate,
-          hireDate: req.body.hireDate,
+          hireDate: req.body.birthday,
           image: req.body.image,
           salary: req.body.salary,
         },
@@ -125,7 +122,7 @@ exports.updateAdministrator = async (req, res, next) => {
       .then((data) => {
         if (data === null) next(new Error("Administrator not found"));
         else {
-          if (data["image"] !== null)
+          if (data["image"] !== undefined)
             fs.unlink(data["image"], (error) => next(error));
           res.status(200).json({ data });
         }
@@ -142,7 +139,7 @@ exports.deleteAdministrator = (req, res, next) => {
     .then((data) => {
       if (data === null) throw new Error("Administrator not found");
       else {
-        if (data["image"] !== null)
+        if (data["image"] !== undefined)
           fs.unlink(data["image"], (error) => next(error));
 
         let currentMonth = new Date().getMonth();

@@ -20,14 +20,6 @@ router
     validateAdministrator.addValidationArray,
     validateMW,
     AdministratorController.addAdministrator
-  )
-  .patch(
-    basicAdmin,
-    uploadImg("Administrator").single("image"),
-    setImage,
-    validateAdministrator.updateValidationArray,
-    validateMW,
-    AdministratorController.updateAdministrator
   );
 
 router
@@ -37,6 +29,14 @@ router
     validateAdministrator.getValidationArray,
     validateMW,
     AdministratorController.getAdministrator
+  )
+  .patch(
+    basicAdmin,
+    uploadImg("Administrator").single("image"),
+    setImage,
+    validateAdministrator.updateValidationArray,
+    validateMW,
+    AdministratorController.updateAdministrator
   )
   .delete(
     basicAdmin,
