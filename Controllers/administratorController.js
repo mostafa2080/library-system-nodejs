@@ -49,7 +49,7 @@ exports.addAdministrator = (req, res, next) => {
     email: req.body.email,
     password: bcrypt.hashSync(req.body.password, salt),
     hireDate: req.body.hireDate,
-    birthDate: req.body.birthday,
+    birthday: req.body.birthday,
     salary: req.body.salary,
     image: req.body.image,
     setting: "default",
@@ -91,7 +91,7 @@ exports.updateAdministrator = async (req, res, next) => {
         $set: {
           firstName: req.body.firstName,
           lastName: req.body.lastName,
-          birthDate: req.body.birthday,
+          birthday: req.body.birthday,
           image: req.body.image,
         },
       }
@@ -113,8 +113,8 @@ exports.updateAdministrator = async (req, res, next) => {
           firstName: req.body.firstName,
           lastName: req.body.lastName,
           email: req.body.email,
-          birthDate: req.body.birthDate,
-          hireDate: req.body.birthday,
+          birthday: req.body.birthday,
+          hireDate: req.body.hireDate,
           image: req.body.image,
           salary: req.body.salary,
         },
@@ -143,6 +143,7 @@ exports.deleteAdministrator = (req, res, next) => {
         if (data["image"] !== undefined)
           fs.unlink(data["image"], (error) => next(error));
 
+        console.log("deleted img");
         let currentMonth = new Date().getMonth();
         let currentYear = new Date().getFullYear();
         AdministratorReportSchema.updateOne(

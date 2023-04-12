@@ -28,7 +28,7 @@ const administratorSchema = new mongoose.Schema({
     minlength: 4,
     required: [true, "Please Enter Administrator Password"],
   },
-  birthDate: {
+  birthday: {
     type: Date,
     required: [false, "Please Enter Administrator Birth Date"],
   },
