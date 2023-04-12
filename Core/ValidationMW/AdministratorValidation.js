@@ -3,6 +3,12 @@ exports.getValidationArray = [
   param("id").isMongoId().withMessage("Administrator Id must be a valid Id"),
 ];
 exports.addValidationArray = [
+  body("firstName")
+    .isString()
+    .withMessage("Administrator FirstName must be an String"),
+  body("lastName")
+    .isString()
+    .withMessage("Administrator Last Name must be a String"),
   body("email")
     .isEmail()
     .withMessage("Administrator Email must be a valid Email"),
@@ -13,6 +19,10 @@ exports.addValidationArray = [
   body("salary")
     .isNumeric()
     .withMessage("Administrator Salary must be a Number"),
+  body("image")
+    .optional()
+    .isString()
+    .withMessage("Administrator Image must be a String"),
 ];
 exports.updateValidationArray = [
   param("id").isMongoId().withMessage("Administrator Id must be a valid Id"),
@@ -33,7 +43,6 @@ exports.updateValidationArray = [
     .optional()
     .isLength({ min: 4 })
     .withMessage("Administrator Password must be a more than 4 elements"),
-
   body("birthday") //"January 1, 1990, 00:00:00 UTC"
     .optional()
     .isDate()

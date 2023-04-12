@@ -51,6 +51,7 @@ exports.addAdministrator = (req, res, next) => {
     hireDate: req.body.hireDate,
     birthDate: req.body.birthday,
     salary: req.body.salary,
+    image: req.body.image,
     setting: "default",
   })
     .save()
