@@ -12,7 +12,7 @@ router
 router
     .route("/books/id/:_id")
     .get(validator.getValidator, controller.getBook)
-    .put(auth.adminOrAbove, validator.editValidator, controller.updateBook)
+    .patch(auth.adminOrAbove, validator.editValidator, controller.updateBook)
     .delete(
         auth.adminOrAbove,
         validator.deleteValidator,
