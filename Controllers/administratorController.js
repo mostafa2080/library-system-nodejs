@@ -3,7 +3,6 @@ require("../Model/AdministratorModel");
 require("../Model/AdministratorReportModel");
 const fs = require("fs");
 const bcrypt = require("bcrypt");
-const { body } = require("express-validator");
 
 const saltRounds = 10;
 const salt = bcrypt.genSaltSync(saltRounds);
@@ -25,14 +24,14 @@ exports.getAdministrator = (req, res, next) => {
     req.decodedToken.role === "Admin" &&
     req.params.email === req.decodedToken.email
   ) {
-    AdministratorsSchema.find({ email: req.params.email })
+    AdministratorsSchema.find({ _id: req.params.id })
       .then((data) => {
         if (data.length !== 0) res.status(200).json({ data });
         else throw new Error("Administrator Is Not Found");
       })
       .catch((error) => next(error));
   } else if (req.decodedToken.role === "BasicAdmin") {
-    AdministratorsSchema.find({ email: req.params.email })
+    AdministratorsSchema.find({ _id: req.params.id })
       .then((data) => {
         if (data.length !== 0) res.status(200).json({ data });
         else throw new Error("Administrator Is Not Found");
@@ -45,10 +44,14 @@ exports.getAdministrator = (req, res, next) => {
 exports.addAdministrator = (req, res, next) => {
   let date = new Date();
   new AdministratorsSchema({
+    firstName: req.body.firstName,
+    lastName: req.body.lastName,
     email: req.body.email,
     password: bcrypt.hashSync(req.body.password, salt),
-    hireDate: date,
+    hireDate: req.body.hireDate,
+    birthday: req.body.birthday,
     salary: req.body.salary,
+    image: req.body.image,
     setting: "default",
   })
     .save()
@@ -82,13 +85,12 @@ exports.updateAdministrator = async (req, res, next) => {
     req.body.email === req.decodedToken.email
   ) {
     AdministratorsSchema.findOneAndUpdate(
-      { email: req.body.email },
+      { _id: req.params.id },
       {
         $set: {
           firstName: req.body.firstName,
           lastName: req.body.lastName,
-          password: hashPass,
-          birthDate: req.body.birthDate,
+          birthday: req.body.birthday,
           image: req.body.image,
         },
       }
@@ -96,22 +98,23 @@ exports.updateAdministrator = async (req, res, next) => {
       .then((data) => {
         if (data === null) next(new Error("Administrator not found"));
         else {
-          if (data["image"] != null)
-            fs.unlink(data["image"], (error) => next(error));
+          if (data["image"] != undefined)
+            fs.unlink(data["image"], (error) => {
+              if (error) console.log(error);
+            });
           res.status(200).json({ data });
         }
       })
       .catch((err) => next(err));
   } else if (req.decodedToken.role === "BasicAdmin") {
     AdministratorsSchema.findOneAndUpdate(
-      { email: req.body.email },
+      { _id: req.params.id },
       {
         $set: {
           firstName: req.body.firstName,
           lastName: req.body.lastName,
           email: req.body.email,
-          password: hashPass,
-          birthDate: req.body.birthDate,
+          birthday: req.body.birthday,
           hireDate: req.body.hireDate,
           image: req.body.image,
           salary: req.body.salary,
@@ -121,28 +124,33 @@ exports.updateAdministrator = async (req, res, next) => {
       .then((data) => {
         if (data === null) next(new Error("Administrator not found"));
         else {
-          if (data["image"] !== null)
-            fs.unlink(data["image"], (error) => next(error));
+          if (data["image"] !== undefined && req.body.image !== undefined)
+            fs.unlink(data["image"], (error) => {
+              if (error) console.log(error);
+            });
           res.status(200).json({ data });
         }
       })
-      .catch((err) => next(err));
+      .catch((error) => next(error));
   }
 };
 
 // Delete a Administrator
 exports.deleteAdministrator = (req, res, next) => {
   AdministratorsSchema.findOneAndDelete({
-    email: req.params.email,
+    _id: req.params.id,
   })
     .then((data) => {
       if (data === null) throw new Error("Administrator not found");
       else {
-        if (data["image"] !== null)
-          fs.unlink(data["image"], (error) => next(error));
+        if (data["image"] !== undefined)
+          fs.unlink(data["image"], (error) => {
+            if (error) console.log(error);
+          });
 
         let currentMonth = new Date().getMonth();
         let currentYear = new Date().getFullYear();
+
         AdministratorReportSchema.updateOne(
           { month: currentMonth, year: currentYear },
           {

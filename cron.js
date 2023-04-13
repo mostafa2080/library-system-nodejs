@@ -14,7 +14,7 @@ exports.banAndUnbanMembers = () => {
     console.log("Current time: ", d.toLocaleString());
   });
 
-  const readingReturnJob = new CronJob("59 12 * * * *", () => {
+  const readingReturnJob = new CronJob("0 */10 * * * *", () => {
     console.log("Checking For The Return Of Books....");
     checkingUnReturnedReadBooks();
     console.log("End Of Checking");

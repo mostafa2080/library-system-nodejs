@@ -9,10 +9,10 @@ module.exports = async (req, res, next) => {
     next(new Error("Email Or Password Are Wrong..."));
   else {
     let data = await AdminSchema.findOne(
-      { email: req.body.email },
-      { email: 1, password: 1 }
+      { email: req.body.email }
     );
     if (data !== null) {
+        let data2 = data;
       if (req.body.email === "BasicAdmin@Library.Co") {
         bcrypt
           .compare(req.body.password, data["password"])
@@ -23,6 +23,7 @@ module.exports = async (req, res, next) => {
               });
               res.status(200).json({
                 Message: "Authenticated",
+                data: data2,
                 token,
               });
             } else throw new Error("Email Or Password Are Wrong");
@@ -36,15 +37,17 @@ module.exports = async (req, res, next) => {
               let token = jwt.sign(
                 {
                   role: "Admin",
-                  email: data["email"],
+                  email: data2["email"],
                 },
                 "OSTrack",
                 {
                   expiresIn: "8h",
                 }
               );
+
               res.status(200).json({
                 Message: "Authenticated",
+                data: data2,
                 token,
               });
             } else throw new Error("Email Or Password Are Wrong");

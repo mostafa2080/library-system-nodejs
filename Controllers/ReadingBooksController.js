@@ -13,7 +13,8 @@ exports.getReadingBookReport = (req, res, next) => {
     $or: [
       { $and: [{ year: req.body.year }, { month: req.body.month }] },
       { year: req.body.year },
-      { month: req.body.month },{}
+      { month: req.body.month },
+      {},
     ],
   })
     .populate("readBooks")
@@ -27,7 +28,7 @@ exports.getReadingBookReport = (req, res, next) => {
 exports.addReadingBook = async (req, res, next) => {
   try {
     const wantedBook = await BooksSchema.findOne({ _id: req.params["_id"] });
-    const member = await MemberSchema.findOne({ email: req.body.email });
+    const member = await MemberSchema.findOne({ _id: req.body["member"] });
     if (wantedBook && wantedBook["isAvailable"]) {
       let date = new Date();
       new ReadingBookSchema({

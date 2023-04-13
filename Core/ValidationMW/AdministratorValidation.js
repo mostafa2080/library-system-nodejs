@@ -1,22 +1,32 @@
 const { body, param } = require("express-validator");
 exports.getValidationArray = [
-  param("email")
-    .isEmail()
-    .withMessage("Administrator Email must be a valid Email"),
+  param("id").isMongoId().withMessage("Administrator Id must be a valid Id"),
 ];
 exports.addValidationArray = [
+  body("firstName")
+    .isString()
+    .withMessage("Administrator FirstName must be an String"),
+  body("lastName")
+    .isString()
+    .withMessage("Administrator Last Name must be a String"),
   body("email")
     .isEmail()
     .withMessage("Administrator Email must be a valid Email"),
   body("password")
-    .isStrongPassword()
-    .isLength({ min: 4 })
-    .withMessage("Administrator Password must be a more than 4 elements"),
+    .optional()
+    .isString()
+    .isLength({ min: 8, max: 20 })
+    .withMessage("Password must be between 8 and 20 characters"),
   body("salary")
     .isNumeric()
     .withMessage("Administrator Salary must be a Number"),
+  body("image")
+    .optional()
+    .isString()
+    .withMessage("Administrator Image must be a String"),
 ];
 exports.updateValidationArray = [
+  param("id").isMongoId().withMessage("Administrator Id must be a valid Id"),
   body("firstName")
     .optional()
     .isString()
@@ -30,18 +40,24 @@ exports.updateValidationArray = [
     .isEmail()
     .withMessage("Administrator Email must be a valid Email"),
   body("password")
-    .isStrongPassword()
     .optional()
-    .isLength({ min: 4 })
-    .withMessage("Administrator Password must be a more than 4 elements"),
-  body("birthDate") //"January 1, 1990, 00:00:00 UTC"
+    .isString()
+    .isLength({ min: 8, max: 20 })
+    .withMessage("Password must be between 8 and 20 characters"),
+  // body("password")
+  //   .isStrongPassword()
+  //   .optional()
+  //   .isLength({ min: 4 })
+  //   .withMessage("Administrator Password must be a more than 4 elements"),
+  // body("birthday") //"January 1, 1990, 00:00:00 UTC"
+  //   .optional()
+  //   .isDate()
+  //   .withMessage("Birthday is not valid"),
+  body("hireDate")
     .optional()
+    .trim()
     .isDate()
-    .withMessage("birth Date must be a Correct Date"),
-  body("hireDate") //"January 1, 1990, 00:00:00 UTC"
-    .optional()
-    .isDate()
-    .withMessage("Hire Date must be Correct Date"),
+    .withMessage("Hire date is not valid"),
   body("image")
     .optional()
     .isString()
@@ -52,7 +68,5 @@ exports.updateValidationArray = [
     .withMessage("Administrator Salary must be a Number"),
 ];
 exports.deleteValidationArray = [
-  param("email")
-    .isEmail()
-    .withMessage("Administrator Email must be a valid Email"),
+  param("id").isMongoId().withMessage("Administrator Id must be a valid Id"),
 ];

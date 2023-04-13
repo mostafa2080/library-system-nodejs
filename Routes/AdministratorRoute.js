@@ -15,9 +15,20 @@ router
   .get(basicAdmin, AdministratorController.getAllAdministrators)
   .post(
     basicAdmin,
+    uploadImg("Administrator").single("image"),
+    setImage,
     validateAdministrator.addValidationArray,
     validateMW,
     AdministratorController.addAdministrator
+  );
+
+router
+  .route("/administrators/:id")
+  .get(
+    adminOrAbove,
+    validateAdministrator.getValidationArray,
+    validateMW,
+    AdministratorController.getAdministrator
   )
   .patch(
     basicAdmin,
@@ -26,15 +37,6 @@ router
     validateAdministrator.updateValidationArray,
     validateMW,
     AdministratorController.updateAdministrator
-  );
-
-router
-  .route("/administrators/:email")
-  .get(
-    adminOrAbove,
-    validateAdministrator.getValidationArray,
-    validateMW,
-    AdministratorController.getAdministrator
   )
   .delete(
     basicAdmin,
