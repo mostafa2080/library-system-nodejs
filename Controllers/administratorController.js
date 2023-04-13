@@ -77,7 +77,6 @@ exports.addAdministrator = (req, res, next) => {
 
 //Update a Administrator
 exports.updateAdministrator = async (req, res, next) => {
-  console.log(req.params);
   let hashPass = req.body.password
     ? bcrypt.hashSync(req.body.password, salt)
     : req.body.password;
@@ -100,7 +99,9 @@ exports.updateAdministrator = async (req, res, next) => {
         if (data === null) next(new Error("Administrator not found"));
         else {
           if (data["image"] != undefined)
-            fs.unlink(data["image"], (error) => next(error));
+            fs.unlink(data["image"], (error) => {
+              if (error) console.log(error);
+            });
           res.status(200).json({ data });
         }
       })
@@ -123,12 +124,14 @@ exports.updateAdministrator = async (req, res, next) => {
       .then((data) => {
         if (data === null) next(new Error("Administrator not found"));
         else {
-          if (data["image"] !== undefined)
-            fs.unlink(data["image"], (error) => next(error));
+          if (data["image"] !== undefined && req.body.image !== undefined)
+            fs.unlink(data["image"], (error) => {
+              if (error) console.log(error);
+            });
           res.status(200).json({ data });
         }
       })
-      .catch((err) => next(err));
+      .catch((error) => next(error));
   }
 };
 
@@ -141,11 +144,13 @@ exports.deleteAdministrator = (req, res, next) => {
       if (data === null) throw new Error("Administrator not found");
       else {
         if (data["image"] !== undefined)
-          fs.unlink(data["image"], (error) => next(error));
+          fs.unlink(data["image"], (error) => {
+            if (error) console.log(error);
+          });
 
-        console.log("deleted img");
         let currentMonth = new Date().getMonth();
         let currentYear = new Date().getFullYear();
+
         AdministratorReportSchema.updateOne(
           { month: currentMonth, year: currentYear },
           {
