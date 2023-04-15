@@ -10,10 +10,6 @@ const administratorSchema = new mongoose.Schema({
     type: String,
     required: [false, "Please Enter Administrator Last Name "],
   },
-  role: {
-    type: String,
-    required: [false, "Please Enter Role Of Admin"],
-  },
   email: {
     type: String,
     match: [
@@ -41,7 +37,14 @@ const administratorSchema = new mongoose.Schema({
     type: Number,
     required: [true, "Please Enter Administrator Salary"],
   },
-  setting: String,
+  role: {
+    type: String,
+    required: [false, "Please Enter Role Of Admin"],
+  },
+  setting: {
+    type: String,
+    required: [false, "Please Enter Role Of Admin"],
+  },
 });
 
 // Mapping Schema to Model

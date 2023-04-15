@@ -6,54 +6,33 @@ const AdminSchema = mongoose.model("administrators");
 
 module.exports = async (req, res, next) => {
   if (!req.body.email || !req.body.password)
-    next(new Error("Email Or Password Are Wrong..."));
+    next(new Error("Email Or Password Are Wrong"));
   else {
-    let data = await AdminSchema.findOne(
-      { email: req.body.email }
-    );
-    if (data !== null) {
-        let data2 = data;
-      if (req.body.email === "BasicAdmin@Library.Co") {
-        bcrypt
-          .compare(req.body.password, data["password"])
-          .then((data) => {
-            if (data) {
-              let token = jwt.sign({ role: "BasicAdmin" }, "OSTrack", {
-                expiresIn: "8h",
-              });
-              res.status(200).json({
-                Message: "Authenticated",
-                data: data2,
-                token,
-              });
-            } else throw new Error("Email Or Password Are Wrong");
-          })
-          .catch((error) => next(error));
-      } else {
-        bcrypt
-          .compare(req.body.password, data["password"])
-          .then((data) => {
-            if (data) {
-              let token = jwt.sign(
-                {
-                  role: "Admin",
-                  email: data2["email"],
-                },
-                "OSTrack",
-                {
-                  expiresIn: "8h",
-                }
-              );
+    try {
+      let admin = await AdminSchema.findOne({ email: req.body.email });
 
-              res.status(200).json({
-                Message: "Authenticated",
-                data: data2,
-                token,
-              });
-            } else throw new Error("Email Or Password Are Wrong");
-          })
-          .catch((error) => next(error));
-      }
-    } else next(new Error("Email Or Password Are Wrong"));
+      if (admin !== null) {
+        let result = bcrypt.compare(req.body.password, admin["password"]);
+
+        if (result) {
+          let token = jwt.sign(
+            { id: admin["_id"], role: admin["role"] },
+            "OSTrack",
+            {
+              expiresIn: "8h",
+            }
+          );
+
+          res.status(200).json({
+            Message: "Authenticated",
+            id: admin["_id"],
+            data: admin,
+            token,
+          });
+        } else throw new Error("Email Or Password Are Wrong");
+      } else throw new Error("Email Or Password Are Wrong");
+    } catch (error) {
+      next(error);
+    }
   }
 };

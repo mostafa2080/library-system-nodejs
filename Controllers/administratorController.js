@@ -18,11 +18,11 @@ exports.getAllAdministrators = (req, res, next) => {
     .catch((error) => next(error));
 };
 
-//Get One Specific Admin
 exports.getAdministrator = (req, res, next) => {
+  //Getting Data Of the same Admin
   if (
     req.decodedToken.role === "Admin" &&
-    req.params.email === req.decodedToken.email
+    req.params.id === req.decodedToken.id
   ) {
     AdministratorsSchema.find({ _id: req.params.id })
       .then((data) => {
@@ -30,7 +30,9 @@ exports.getAdministrator = (req, res, next) => {
         else throw new Error("Administrator Is Not Found");
       })
       .catch((error) => next(error));
-  } else if (req.decodedToken.role === "BasicAdmin") {
+  }
+  //Getting Data With BasicAdmin
+  else if (req.decodedToken.role === "BasicAdmin") {
     AdministratorsSchema.find({ _id: req.params.id })
       .then((data) => {
         if (data.length !== 0) res.status(200).json({ data });
@@ -42,7 +44,6 @@ exports.getAdministrator = (req, res, next) => {
 
 // Add a Administrator
 exports.addAdministrator = (req, res, next) => {
-  let date = new Date();
   new AdministratorsSchema({
     firstName: req.body.firstName,
     lastName: req.body.lastName,
@@ -53,13 +54,12 @@ exports.addAdministrator = (req, res, next) => {
     salary: req.body.salary,
     image: req.body.image,
     setting: "default",
+    role: "Admin",
   })
     .save()
     .then((data) => {
-      let currentMonth = date.getMonth();
-      let currentYear = date.getFullYear();
       AdministratorReportSchema.updateOne(
-        { month: currentMonth, year: currentYear },
+        { month: new Date().getMonth(), year: new Date().getFullYear() },
         {
           $inc: {
             administratorsNumber: 1,
@@ -77,12 +77,14 @@ exports.addAdministrator = (req, res, next) => {
 
 //Update a Administrator
 exports.updateAdministrator = async (req, res, next) => {
+  console.log(req.body);
+  console.log(req.decodedToken);
   let hashPass = req.body.password
     ? bcrypt.hashSync(req.body.password, salt)
     : req.body.password;
   if (
     req.decodedToken.role === "Admin" &&
-    req.body.email === req.decodedToken.email
+    req.params.id === req.decodedToken.id
   ) {
     AdministratorsSchema.findOneAndUpdate(
       { _id: req.params.id },
@@ -102,6 +104,7 @@ exports.updateAdministrator = async (req, res, next) => {
             fs.unlink(data["image"], (error) => {
               if (error) console.log(error);
             });
+
           res.status(200).json({ data });
         }
       })
@@ -132,7 +135,7 @@ exports.updateAdministrator = async (req, res, next) => {
         }
       })
       .catch((error) => next(error));
-  }
+  } else next(new Error("UnAuthorized For This Operation"));
 };
 
 // Delete a Administrator
@@ -148,11 +151,8 @@ exports.deleteAdministrator = (req, res, next) => {
             if (error) console.log(error);
           });
 
-        let currentMonth = new Date().getMonth();
-        let currentYear = new Date().getFullYear();
-
         AdministratorReportSchema.updateOne(
-          { month: currentMonth, year: currentYear },
+          { month: new Date().getMonth(), year: new Date().getFullYear() },
           {
             $inc: {
               existingAdministratorsNumber: -1,
