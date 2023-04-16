@@ -33,10 +33,10 @@ exports.getBorrow = async (req, res, next) => {
 };
 //Add a new record to the Borrows collection
 exports.addBorrow = async (req, res, next) => {
-    const continueWithBorrow = await canBorrow(req, res, next);
-    if (!continueWithBorrow) {
+    const errors = await borrowErrors(req, res, next);
+    if (errors) {
         res.status(403).json({
-            message: "Can't borrow.",
+            errors,
         });
         return;
     }
@@ -179,22 +179,21 @@ exports.deleteBorrow = async (req, res, next) => {
 };
 
 //Check if a member can borrow a book
-const canBorrow = async (req, res, next) => {
+const borrowErrors = async (req, res, next) => {
+    errors = {};
     const book = await Books.findOne({
         _id: req.body.book,
         isAvailable: true,
     });
 
-    if (!book) return false;
-    console.log('book found');
+    if (!book) error.book = 'Book Not Found.';
 
     const member = await Members.findOne({
         _id: req.body.member,
         isBanned: false,
     });
 
-    if (!member) return false;
-    console.log('member found');
+    if (!member) error.member = 'Member Not Found.';
 
     const unreturnedBorrows = await unreturnedBorrowsOfSameBookCount(
         req,
@@ -204,10 +203,19 @@ const canBorrow = async (req, res, next) => {
 
     const availableCopies = await this.totalAvailableCopies(req.body.book);
     console.log(availableCopies);
-    if (unreturnedBorrows === 0 && availableCopies > 1 && !member.isBanned) {
-        return true;
+    if (unreturnedBorrows !== 0) {
+        errors.unreturned = "Member hasn't returned this book yet.";
     }
-    return false;
+
+    if (availableCopies <= 1) {
+        errors.copies = 'Insufficient number of copies.';
+    }
+
+    if (member.isBanned) {
+        errors.banned = 'Member is banned.';
+    }
+
+    return errors;
 };
 //count the number of unreturned Borrows
 const unreturnedBorrowsOfSameBookCount = async (req, res, next) =>
