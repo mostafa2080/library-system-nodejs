@@ -190,7 +190,6 @@ const borrowErrors = async (req, res, next) => {
 
     const member = await Members.findOne({
         _id: req.body.member,
-        isBanned: false,
     });
 
     if (!member) errors.member = 'Member Not Found.';
