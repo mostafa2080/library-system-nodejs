@@ -186,14 +186,14 @@ const borrowErrors = async (req, res, next) => {
         isAvailable: true,
     });
 
-    if (!book) error.book = 'Book Not Found.';
+    if (!book) errors.book = 'Book Not Found.';
 
     const member = await Members.findOne({
         _id: req.body.member,
         isBanned: false,
     });
 
-    if (!member) error.member = 'Member Not Found.';
+    if (!member) errors.member = 'Member Not Found.';
 
     const unreturnedBorrows = await unreturnedBorrowsOfSameBookCount(
         req,
