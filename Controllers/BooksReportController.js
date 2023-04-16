@@ -26,7 +26,7 @@ exports.borrowedBooksDetails = (req, res, next) => {
 };
 //Retrieve all the currently borrowed books by a specific member
 exports.borrowedBooksByMember = (req, res, next) => {
-  Borrow.find({ memberID: req.params.memberID, returnDate: null })
+  Borrow.find({ member: req.params.member, returnDate: null })
     .then((borrows) => {
       res.status(200).json(borrows);
     })
@@ -38,7 +38,7 @@ exports.borrowedBooksByMember = (req, res, next) => {
 //Get the number of borrowed books by a member with a given member ID
 exports.numberBorrowedBooksByMember = (req, res, next) => {
   Borrow.find({
-    memberID: req.params.memberID,
+    member: req.params.member,
     returnDate: null,
   }).countDocuments((err, count) => {
     if (err) {
@@ -57,7 +57,7 @@ exports.mostBorrowedBooks = async (req, res, next) => {
     },
     {
       $group: {
-        _id: '$bookID',
+        _id: '$book',
         count: { $sum: 1 },
       },
     },
@@ -85,11 +85,11 @@ exports.mostBorrowedBooks = async (req, res, next) => {
 exports.mostBorrowedBooksByMember = async (req, res, next) => {
   const data = await Borrow.aggregate([
     {
-      $match: { memberID: req.params.memberID },
+      $match: { member: req.params.member },
     },
     {
       $group: {
-        _id: '$bookID',
+        _id: '$book',
         count: { $sum: 1 },
       },
     },
@@ -154,7 +154,7 @@ exports.readBooks = async (req, res, next) => {
 
 //Find the books read by a specific member today
 exports.readBooksByMember = async (req, res, next) => {
-  const data = await Read.find({ member: req.params.memberID });
+  const data = await Read.find({ member: req.params.member });
     const populatedData = await Books.populate(data, {
         path: "book",
         select: "title"

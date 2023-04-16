@@ -1,18 +1,21 @@
-const mongoose = require("mongoose");
-require("../Model/BooksModel");
-require("../Model/BorrowsModel");
-require("../Model/MembersModel");
-require("../Model/ReadingBooksModel");
+const mongoose = require('mongoose');
+require('../Model/BooksModel');
+require('../Model/BorrowsModel');
+require('../Model/MembersModel');
+require('../Model/ReadingBooksModel');
 
-const Books = mongoose.model("books");
-const Borrows = mongoose.model("borrows");
-const Members = mongoose.model("members");
-const ReadingBooks = mongoose.model("readingBooks");
+const Books = mongoose.model('books');
+const Borrows = mongoose.model('borrows');
+const Members = mongoose.model('members');
+const ReadingBooks = mongoose.model('readingBooks');
 
 //Retrieve all the records from the Borrows collection
 exports.getAllBorrows = async (req, res, next) => {
     try {
-        const results = await Borrows.find({});
+        const results = await Borrows.find({})
+            .populate('book')
+            .populate('member')
+            .populate('employee');
         res.status(200).json({ results });
     } catch (err) {
         next(err);
@@ -41,17 +44,19 @@ exports.addBorrow = async (req, res, next) => {
         const date = new Date();
         const twoDaysDeadlineDate = date.setDate(date.getDate() + 2);
         const result = await new Borrows({
-            bookID: req.body.bookID,
-            memberID: req.body.memberID,
-            employeeID: req.body.employeeID,
+            book: req.body.book,
+            member: req.body.member,
+            employee: req.body.employee,
             borrowDate: date.now,
             returnDate: null,
-            deadlineDate: req.body.deadlineDate || new Date(twoDaysDeadlineDate).toISOString(),
+            deadlineDate:
+                req.body.deadlineDate ||
+                new Date(twoDaysDeadlineDate).toISOString(),
         }).save();
 
         const book = await Books.findOne(
             {
-                _id: result.bookID,
+                _id: result.book,
             },
             { copiesCount: 1, title: 1 }
         );
@@ -59,7 +64,7 @@ exports.addBorrow = async (req, res, next) => {
         //Finds the count of all active borrows for a specific book
         if (this.totalAvailableCopies <= 0) {
             await Books.updateOne(
-                { _id: result.bookID },
+                { _id: result.book },
                 {
                     $set: {
                         isAvailable: false,
@@ -84,26 +89,29 @@ exports.updateBorrow = async (req, res, next) => {
             { _id: req.params._id },
             {
                 $set: {
-                    bookID: req.body.bookID,
-                    memberID: req.body.memberID,
-                    employeeID: req.body.employeeID,
+                    book: req.body.book,
+                    member: req.body.member,
+                    employee: req.body.employee,
                     returnDate: req.body.returnDate,
                     deadlineDate: req.body.deadlineDate,
                 },
             },
             { new: true }
-        );
+        )
+            .populate('book')
+            .populate('member')
+            .populate('employee');
         //Find a Book
         const book = await Books.findOne(
             {
-                _id: result.bookID,
+                _id: result.book,
             },
             { copiesCount: 1, title: 1 }
         );
 
         if (this.totalAvailableCopies > 0) {
             await Books.updateOne(
-                { _id: result.bookID },
+                { _id: result.book },
                 {
                     $set: {
                         isAvailable: true,
@@ -117,7 +125,7 @@ exports.updateBorrow = async (req, res, next) => {
             });
         } else {
             await Books.updateOne(
-                { _id: result.bookID },
+                { _id: result.book },
                 {
                     $set: {
                         isAvailable: false,
@@ -135,17 +143,17 @@ exports.updateBorrow = async (req, res, next) => {
 exports.deleteBorrow = async (req, res, next) => {
     try {
         const result = await Borrows.findOneAndDelete({ _id: req.params._id });
-        if (!result) throw new Error("Borrow not found");
+        if (!result) throw new Error('Borrow not found');
 
         const book = await Books.findOne({
-            _id: result.bookID,
+            _id: result.book,
             isAvailable: false,
         });
 
         if (book) {
             await Books.updateOne(
                 {
-                    _id: result.bookID,
+                    _id: result.book,
                     isAvailable: false,
                 },
                 {
@@ -169,20 +177,20 @@ exports.deleteBorrow = async (req, res, next) => {
 //Check if a member can borrow a book
 const canBorrow = async (req, res, next) => {
     const book = await Books.findOne({
-        _id: req.body.bookID,
+        _id: req.body.book,
         isAvailable: true,
     });
 
     if (!book) return false;
-    console.log("book found");
+    console.log('book found');
 
     const member = await Members.findOne({
-        _id: req.body.memberID,
+        _id: req.body.member,
         isBanned: false,
     });
 
     if (!member) return false;
-    console.log("member found");
+    console.log('member found');
 
     const unreturnedBorrows = await unreturnedBorrowsOfSameBookCount(
         req,
@@ -190,7 +198,7 @@ const canBorrow = async (req, res, next) => {
         next
     );
 
-    const availableCopies = await this.totalAvailableCopies(req.body.bookID);
+    const availableCopies = await this.totalAvailableCopies(req.body.book);
     console.log(availableCopies);
     if (unreturnedBorrows === 0 && availableCopies > 1 && !member.isBanned) {
         return true;
@@ -200,8 +208,8 @@ const canBorrow = async (req, res, next) => {
 //count the number of unreturned Borrows
 const unreturnedBorrowsOfSameBookCount = async (req, res, next) =>
     await Borrows.find({
-        bookID: req.body.bookID,
-        memberID: req.body.memberID,
+        book: req.body.book,
+        member: req.body.member,
         returnDate: null,
     }).count();
 
@@ -211,13 +219,13 @@ exports.bansCheckCycle = async () => {
     try {
         const unreturnedBorrows = await Borrows.find({
             returnDate: null,
-            $expr: { $lt: ["$deadlineDate", date] },
+            $expr: { $lt: ['$deadlineDate', date] },
         });
 
         unreturnedBorrows.forEach(async (borrow) => {
             const result = await Members.findOneAndUpdate(
                 {
-                    _id: borrow.memberID,
+                    _id: borrow.member,
                 },
                 {
                     $set: {
@@ -232,14 +240,14 @@ exports.bansCheckCycle = async () => {
     }
     try {
         const returnedBorrowsAfterDeadline = await Borrows.find({
-            $expr: { $gt: ["$returnDate", "$deadlineDate"] },
+            $expr: { $gt: ['$returnDate', '$deadlineDate'] },
         });
 
         returnedBorrowsAfterDeadline.forEach(async (borrow) => {
             if (borrow.returnDate.setDate(borrow.returnDate + 7) > date) {
                 const result = await Members.findOneAndUpdate(
                     {
-                        _id: borrow.memberID,
+                        _id: borrow.member,
                     },
                     {
                         $set: {
@@ -251,7 +259,7 @@ exports.bansCheckCycle = async () => {
             } else {
                 const result = await Members.findOneAndUpdate(
                     {
-                        _id: borrow.memberID,
+                        _id: borrow.member,
                     },
                     {
                         $set: {
@@ -267,7 +275,7 @@ exports.bansCheckCycle = async () => {
     }
 
     const d = new Date();
-    console.log("Ban/unban cycle complete at:", d.toLocaleString());
+    console.log('Ban/unban cycle complete at:', d.toLocaleString());
 };
 
 exports.totalAvailableCopies = async (bookID) => {
@@ -278,7 +286,7 @@ exports.totalAvailableCopies = async (bookID) => {
     const totalCopies = book.copiesCount;
 
     const borrowedCopiesCount = await Borrows.find({
-        bookID: bookID,
+        book: bookID,
         returnDate: null,
     }).count();
 
