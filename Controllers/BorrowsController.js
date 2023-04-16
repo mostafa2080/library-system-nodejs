@@ -43,7 +43,7 @@ exports.addBorrow = async (req, res, next) => {
     try {
         const date = new Date();
         const twoDaysDeadlineDate = date.setDate(date.getDate() + 2);
-        const result = await new Borrows({
+        const borrow = await new Borrows({
             book: req.body.book,
             member: req.body.member,
             employee: req.body.employee,
@@ -56,7 +56,7 @@ exports.addBorrow = async (req, res, next) => {
 
         const book = await Books.findOne(
             {
-                _id: result.book,
+                _id: borrow.book,
             },
             { copiesCount: 1, title: 1 }
         );
@@ -64,7 +64,7 @@ exports.addBorrow = async (req, res, next) => {
         //Finds the count of all active borrows for a specific book
         if (this.totalAvailableCopies <= 0) {
             await Books.updateOne(
-                { _id: result.book },
+                { _id: borrow.book },
                 {
                     $set: {
                         isAvailable: false,
@@ -72,10 +72,14 @@ exports.addBorrow = async (req, res, next) => {
                 }
             );
             res.status(200).json({
-                result,
+                borrow,
                 message: `Book: ${book.title} is not available anymore.`,
             });
         }
+        const result = await Borrows.findOne({ _id: borrow._id })
+            .populate('book')
+            .populate('employee')
+            .populate('member');
 
         res.status(201).json({ result });
     } catch (err) {
