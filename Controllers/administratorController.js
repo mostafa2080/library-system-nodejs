@@ -8,16 +8,24 @@ const saltRounds = 10;
 const salt = bcrypt.genSaltSync(saltRounds);
 const AdministratorsSchema = mongoose.model("administrators");
 const AdministratorReportSchema = mongoose.model("administratorsReport");
+const NodeCache = require('node-cache');
+const cache = new NodeCache({ stdTTL: 60, checkperiod: 120 });
 
-// Get all administrators
 exports.getAllAdministrators = (req, res, next) => {
-  AdministratorsSchema.find({})
-    .then((data) => {
-      res.status(200).json({ data });
-    })
-    .catch((error) => next(error));
-};
+const cacheKey = 'getAllAdministrators';
+const cachedData = cache.get(cacheKey);
+if (cachedData) {
+console.log(`from Cache`);
+return res.status(200).json({ data: cachedData });
+}
 
+AdministratorsSchema.find({})
+.then((data) => {
+cache.set(cacheKey, data);
+res.status(200).json({ data });
+})
+.catch((error) => next(error));
+};
 exports.getAdministrator = (req, res, next) => {
   //Getting Data Of the same Admin
   if (
