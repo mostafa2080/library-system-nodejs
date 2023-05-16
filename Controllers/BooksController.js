@@ -1,6 +1,8 @@
 const mongoose = require('mongoose');
 require('../Model/BooksModel');
 const Books = mongoose.model('books');
+const NodeCache = require( "node-cache" );
+const myCache = new NodeCache( { stdTTL: 100, checkperiod: 120 } );
 
 exports.getAllBooks = async (req, res, next) => {
   try {
