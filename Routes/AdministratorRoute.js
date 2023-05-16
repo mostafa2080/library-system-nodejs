@@ -31,7 +31,7 @@ router
     AdministratorController.getAdministrator
   )
   .patch(
-    basicAdmin,
+    adminOrAbove,
     uploadImg("Administrator").single("image"),
     setImage,
     validateAdministrator.updateValidationArray,

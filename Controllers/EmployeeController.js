@@ -107,7 +107,9 @@ exports.updateEmployee = (req, res, next) => {
                 image: req.body.image,
                 settings: "manual",
             }
-        })
+        },
+        {new : true}
+        )
         .then((data) => {
 
             if(req.file !== undefined){

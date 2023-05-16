@@ -1,18 +1,21 @@
 const mongoose = require("mongoose");
 
 const borrowsSchema = mongoose.Schema({
-    bookID: {
-        type: String,
+    book: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'books',
         trim: true,
         required: [true, "Enter a valid book ID"],
     },
-    memberID: {
-        type: String,
+    member: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'members',
         trim: true,
         required: [true, "Enter a valid book ID"],
     },
-    employeeID: {
-        type: String,
+    employee: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'employees',
         trim: true,
         required: [true, "Enter a valid book ID"],
     },

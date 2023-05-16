@@ -11,7 +11,7 @@ router
 
 router
     .route("/borrows/:_id")
-    .put(auth.employeeOrAbove, validator.editValidator, controller.updateBorrow)
+    .patch(auth.employeeOrAbove, validator.editValidator, controller.updateBorrow)
     .delete(auth.employeeOrAbove, validator.deleteValidator, controller.deleteBorrow);
 
 module.exports = router;
